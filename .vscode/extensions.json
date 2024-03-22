@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "bbenoist.nix",
+    "streetsidesoftware.code-spell-checker",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "nrwl.angular-console"
+  ]
+}
