@@ -1,0 +1,60 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "workspaceLayout": {
+    "appsDir": "apps",
+    "libsDir": "libs"
+  },
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["core", "build", "^core", "^build"]
+    },
+    "typecheck": {
+      "cache": true,
+      "inputs": ["core", "build", "test"]
+    },
+    "@nx/eslint:lint": {
+      "cache": true,
+      "outputs": ["{workspaceRoot}/.eslintcache"],
+      "inputs": [
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintrc.*.json",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/.prettierrc",
+        "{projectRoot}/.eslintrc.json",
+        "{projectRoot}/.eslintignore",
+        "build",
+        "core"
+      ],
+      "options": {
+        "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  },
+  "namedInputs": {
+    "core": [
+      "{workspaceRoot}/tsconfig.json",
+      "{workspaceRoot}/pnpm-lock.yaml",
+      "{projectRoot}/pnpm-lock.yaml",
+      "{workspaceRoot}/flake.lock"
+    ],
+    "build": [
+      "{projectRoot}/**/*.{ts,tsx,js,jsx}",
+      "!{projectRoot}/**/*.test.{ts,tsx,js,jsx}",
+      "{projectRoot}/tsconfig.build.json"
+    ],
+    "test": ["{projectRoot}/**/*.{ts,tsx,js,jsx}", "{projectRoot}/tsconfig.test.json"]
+  },
+  "affected": {
+    "defaultBase": "main"
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    }
+  ]
+}
