@@ -1,7 +1,9 @@
 import {trace} from '@opentelemetry/api';
 import {setGlobalErrorHandler} from '@opentelemetry/core';
-import {OTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-proto';
+import {OTLPTraceExporter as HttpOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-http'
+import {OTLPTraceExporter as ProtoOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-proto';
 import {CompressionAlgorithm} from '@opentelemetry/otlp-exporter-base';
+import type {OTLPExporterNodeConfigBase} from '@opentelemetry/otlp-exporter-base';
 import {Resource} from '@opentelemetry/resources';
 import {
   BasicTracerProvider,
@@ -9,10 +11,20 @@ import {
   ConsoleSpanExporter,
   BatchSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
+import type {BufferConfig} from '@opentelemetry/sdk-trace-base';
 import {SEMRESATTRS_PROCESS_RUNTIME_NAME} from '@opentelemetry/semantic-conventions';
-import type {AllegoriaReporterOptions} from './options';
 
 let succeedOnExportFailure = false;
+
+export interface BaseOptions{
+  useHttp?: boolean;
+  disableCompression?: boolean;
+  exporter?: OTLPExporterNodeConfigBase;
+  buffer?: BufferConfig;
+  debug?: boolean;
+  /** By default failing to export test results will fail the test run, enable this option to make it succeed */
+  succeedOnExportFailure?: boolean;
+}
 
 export function onError(error: unknown): void {
   if (error instanceof AggregateError) {
@@ -26,7 +38,7 @@ export function onError(error: unknown): void {
   if (!succeedOnExportFailure) process.exit(1);
 }
 
-export function initializeTracing(options?: AllegoriaReporterOptions) {
+export function initializeTracing(options?: BaseOptions) {
   succeedOnExportFailure = options?.succeedOnExportFailure ?? false;
   setGlobalErrorHandler(onError);
   const provider = new BasicTracerProvider({
@@ -34,10 +46,11 @@ export function initializeTracing(options?: AllegoriaReporterOptions) {
       [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'jest',
     }),
   });
-  const exporter = new OTLPTraceExporter({
+  const exporterConfig = {
     compression: CompressionAlgorithm.GZIP,
     ...options?.exporter,
-  });
+  }
+  const exporter = options?.useHttp ? new HttpOTLPTraceExporter(exporterConfig) : new ProtoOTLPTraceExporter(exporterConfig);
   provider.addSpanProcessor(new BatchSpanProcessor(exporter, options?.buffer));
   if (options?.debug) provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
   provider.register();

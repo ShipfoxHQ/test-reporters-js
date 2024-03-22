@@ -40,12 +40,8 @@
             "allow": [],
             "depConstraints": [
               {
-                "sourceTag": "scope:api",
-                "onlyDependOnLibsWithTags": ["scope:api", "scope:shared"]
-              },
-              {
-                "sourceTag": "scope:client",
-                "onlyDependOnLibsWithTags": ["scope:client", "scope:shared"]
+                "sourceTag": "scope:shared",
+                "onlyDependOnLibsWithTags": ["scope:shared"]
               }
             ]
           }
