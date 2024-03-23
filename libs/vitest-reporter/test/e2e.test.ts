@@ -26,7 +26,7 @@ describe('JestReporter', () => {
 
 
   it('should send traces', async () => {
-    await startVitest('test', [], {reporters: ['dist/index.js'], include: ['../../examples/vitest/src/**/*.test.js']})
+    await startVitest('test', [], {reporters: ['src/index.ts'], include: ['../../examples/vitest/src/**/*.test.js']})
     
     expect(apiCall).toHaveBeenCalled()
     expect(apiCall.mock.calls.length).toBe(1)

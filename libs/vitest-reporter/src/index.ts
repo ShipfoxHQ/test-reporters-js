@@ -1,9 +1,8 @@
 import {initializeTracing, type BaseOptions} from '@allegoria/test-reporter-base'
-import type {Config, TestContext, AggregatedResult} from '@jest/reporters';
 import type {Tracer} from '@opentelemetry/api';
 import {BasicTracerProvider} from '@opentelemetry/sdk-trace-base';
 import type {Reporter, Vitest, File, TaskResultPack} from 'vitest'
-import type { a7 } from 'vitest/dist/reporters-P7C2ytIv';
+import {createTestSuite} from './span'
 
 export type AllegoriaReporterOptions = BaseOptions
 
@@ -20,5 +19,9 @@ export default class AllegoriaReporter implements Reporter {
 
   onTaskUpdate(packs: TaskResultPack[]) {
     console.log(packs)
+  }
+
+  onFinished (files?: File[] | undefined, errors?: unknown[] | undefined) {
+    const spans = files?.map(file => createTestSuite(file))
   }
 }
