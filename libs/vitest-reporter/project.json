@@ -3,5 +3,11 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "src",
   "projectType": "library",
-  "tags": ["scope:shared"]
+  "tags": ["scope:shared"],
+  "targets": {
+    "test": {
+      "executor": "nx:run-script",
+      "dependsOn": ["build", "^build"]
+    }
+  }
 }

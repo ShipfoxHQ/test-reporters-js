@@ -1,20 +1,29 @@
-import {type Context, trace, ROOT_CONTEXT, type Span, type Tracer, SpanKind, type TimeInput} from '@opentelemetry/api';
+import {
+  type Context,
+  trace,
+  ROOT_CONTEXT,
+  type Span,
+  type Tracer,
+  SpanKind,
+  type TimeInput,
+} from '@opentelemetry/api';
+import {getTracer, shutdown} from './tracing';
 
-export type TestCase =(CompletedTestCase | NonCompletedTestCase) & {
+export type TestCase = (CompletedTestCase | NonExecutedTestCase) & {
   name: string;
   ancestors: string[];
-}
+};
 
 export interface CompletedTestCase {
-  status: 'passed' | 'failed' ;
+  status: 'passed' | 'failed';
   start: TimeInput;
   end: TimeInput;
-  retries: number
-  retryReasons: string[]
-  failureMessages: string[]
+  retries: number;
+  retryReasons: string[];
+  failureMessages: string[];
 }
 
-export interface NonCompletedTestCase {
+export interface NonExecutedTestCase {
   status: 'skipped' | 'pending' | 'todo' | 'disabled' | 'focused';
 }
 
@@ -31,10 +40,13 @@ export interface TestRun {
   suites: TestSuite[];
 }
 
-export function createTestRunSpan(
-  run: TestRun,
-  tracer: Tracer,
-): Span {
+export async function sendTestRun(run: TestRun): Promise<void> {
+  createTestRunSpan(run);
+  await shutdown();
+}
+
+export function createTestRunSpan(run: TestRun): Span {
+  const tracer = getTracer();
   const span = tracer.startSpan(
     'Test run',
     {
@@ -72,31 +84,23 @@ export function createTestSuiteSpan(
   );
 
   const context = trace.setSpan(parentContext, span);
-  suite.tests.forEach((test) =>
-    createTestCaseSpan(test, context, tracer),
-  );
+  suite.tests.forEach((test) => createTestCaseSpan(test, context, tracer));
   span.end(suite.end);
   return span;
 }
 
-export function createTestCaseSpan(
-  test: TestCase,
-  parentContext: Context,
-  tracer: Tracer,
-): Span {
-    const span = tracer.startSpan(
-      test.name,
-      {
-        kind: SpanKind.INTERNAL,
-        startTime: "start" in test ? test.start : 0,
-        attributes: getTestCaseSpanAttributes(test),
-      },
-      parentContext,
-    );
-    span.end("end" in test ? test.end : 0);
-    return span;
-  
-
+export function createTestCaseSpan(test: TestCase, parentContext: Context, tracer: Tracer): Span {
+  const span = tracer.startSpan(
+    test.name,
+    {
+      kind: SpanKind.INTERNAL,
+      startTime: 'start' in test ? test.start : 0,
+      attributes: getTestCaseSpanAttributes(test),
+    },
+    parentContext,
+  );
+  span.end('end' in test ? test.end : 0);
+  return span;
 }
 
 function getTestCaseSpanAttributes(test: TestCase) {
@@ -105,12 +109,12 @@ function getTestCaseSpanAttributes(test: TestCase) {
     'test.case.name': test.name,
     'test.case.ancestors.title': test.ancestors,
     'test.case.status': test.status,
-  }
-  if(test.status !== 'failed' && test.status !== 'passed') return attributes
+  };
+  if (test.status !== 'failed' && test.status !== 'passed') return attributes;
   return {
     ...attributes,
     'test.case.failure.messages': test.failureMessages,
     'test.case.retry.count': test.retries,
-    'test.case.retry.reasons': test.retryReasons
-  }
+    'test.case.retry.reasons': test.retryReasons,
+  };
 }

@@ -1,27 +1,33 @@
-import {initializeTracing, type BaseOptions} from '@allegoria/test-reporter-base'
-import type {Tracer} from '@opentelemetry/api';
-import {BasicTracerProvider} from '@opentelemetry/sdk-trace-base';
-import type {Reporter, Vitest, File, TaskResultPack} from 'vitest'
-import {createTestSuite} from './span'
+import {init, type BaseOptions, sendTestRun} from '@allegoria/test-reporter-base';
+import type {Reporter, File, Vitest} from 'vitest';
+import {createDataFromFile} from './result';
 
-export type AllegoriaReporterOptions = BaseOptions
+export type AllegoriaReporterOptions = BaseOptions & {
+  enabled?: boolean;
+};
 
 export default class AllegoriaReporter implements Reporter {
-  tracer: Tracer | undefined
-  provider: BasicTracerProvider | undefined
-  
-  onInit(context: Vitest): void {
-    context.config.config
-    const {tracer, provider} = initializeTracing();
-    this.tracer = tracer;
-    this.provider = provider;
+  start: number;
+  enabled: boolean;
+  context: Vitest | undefined;
+
+  constructor(options?: AllegoriaReporterOptions) {
+    this.start = Date.now();
+    this.enabled = options?.enabled ?? true;
+    if (!this.enabled) return;
+    init(options);
   }
 
-  onTaskUpdate(packs: TaskResultPack[]) {
-    console.log(packs)
+  onInit(context: Vitest) {
+    this.context = context;
   }
 
-  onFinished (files?: File[] | undefined, errors?: unknown[] | undefined) {
-    const spans = files?.map(file => createTestSuite(file))
+  async onFinished(files: File[] = []): Promise<void> {
+    if (!this.enabled) return;
+    const context = this.context;
+    if (!context) throw new Error(`Vitest context not found`);
+    const end = Date.now();
+    const suites = files.map((file) => createDataFromFile(file, context));
+    await sendTestRun({start: this.start, end, suites});
   }
 }

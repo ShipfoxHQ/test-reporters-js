@@ -1,6 +1,6 @@
-import {trace} from '@opentelemetry/api';
+import {trace, type Tracer} from '@opentelemetry/api';
 import {setGlobalErrorHandler} from '@opentelemetry/core';
-import {OTLPTraceExporter as HttpOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-http'
+import {OTLPTraceExporter as HttpOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
 import {OTLPTraceExporter as ProtoOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-proto';
 import {CompressionAlgorithm} from '@opentelemetry/otlp-exporter-base';
 import type {OTLPExporterNodeConfigBase} from '@opentelemetry/otlp-exporter-base';
@@ -16,7 +16,7 @@ import {SEMRESATTRS_PROCESS_RUNTIME_NAME} from '@opentelemetry/semantic-conventi
 
 let succeedOnExportFailure = false;
 
-export interface BaseOptions{
+export interface BaseOptions {
   useHttp?: boolean;
   disableCompression?: boolean;
   exporter?: OTLPExporterNodeConfigBase;
@@ -38,10 +38,13 @@ export function onError(error: unknown): void {
   if (!succeedOnExportFailure) process.exit(1);
 }
 
-export function initializeTracing(options?: BaseOptions) {
+let tracer: Tracer | undefined;
+let provider: BasicTracerProvider | undefined;
+
+export function init(options?: BaseOptions) {
   succeedOnExportFailure = options?.succeedOnExportFailure ?? false;
   setGlobalErrorHandler(onError);
-  const provider = new BasicTracerProvider({
+  provider = new BasicTracerProvider({
     resource: new Resource({
       [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'jest',
     }),
@@ -49,12 +52,27 @@ export function initializeTracing(options?: BaseOptions) {
   const exporterConfig = {
     compression: CompressionAlgorithm.GZIP,
     ...options?.exporter,
-  }
-  const exporter = options?.useHttp ? new HttpOTLPTraceExporter(exporterConfig) : new ProtoOTLPTraceExporter(exporterConfig);
+  };
+  const exporter = options?.useHttp
+    ? new HttpOTLPTraceExporter(exporterConfig)
+    : new ProtoOTLPTraceExporter(exporterConfig);
   provider.addSpanProcessor(new BatchSpanProcessor(exporter, options?.buffer));
   if (options?.debug) provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
   provider.register();
 
-  const tracer = trace.getTracer('@allegoria/jest-reporter');
+  tracer = trace.getTracer('@allegoria/jest-reporter');
   return {provider, exporter, tracer};
+}
+
+export function getTracer(): Tracer {
+  if (!tracer) throw new Error('Tracing was not initialized');
+  return tracer;
+}
+
+export async function shutdown() {
+  try {
+    await provider?.shutdown();
+  } catch (error) {
+    onError(error);
+  }
 }

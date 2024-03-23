@@ -1,5 +1,5 @@
-import {isEven, isOdd} from './index'
-import {describe, it, expect} from 'vitest'
+import {isEven, isOdd} from './index';
+import {describe, it, expect} from 'vitest';
 
 describe('isEven', () => {
   it('should return true if the number is even', () => {
@@ -8,10 +8,6 @@ describe('isEven', () => {
 
   it('should return false if the number is odd', () => {
     expect(isEven(3)).toBe(false);
-  });
-
-  it('should throw an error if the number is not a number', () => {
-    expect(() => isEven('a')).toThrow();
   });
 });
 
@@ -24,11 +20,43 @@ describe('isOdd', () => {
     expect(isOdd(2)).toBe(false);
   });
 
-  it('should throw an error if the number is not a number', () => {
-    expect(() => isOdd('a')).toThrow();
-  });
-
   it.skip('should skip this test', () => {
     expect(1).toBe(1);
   });
 });
+
+describe('nested suite', () => {
+  describe('nested nested suite', () => {
+    it('should succeed', () => {
+      expect(true).toBe(true);
+    });
+  });
+
+  describe.skip('skipped nested suite', () => {
+    it('should not run as the suite is skipped', () => {
+      expect(false).toBe(true);
+    });
+  });
+});
+
+describe('failing tests', () => {
+  it('should fail', () => {
+    expect(true).toBe(false);
+  });
+
+  it.fails('should succeed as it is a failing test', () => {
+    expect(true).toBe(false);
+  });
+});
+
+describe.skip('skipped suite', () => {
+  it('should not run as the suite is skipped', () => {
+    expect(false).toBe(true);
+  });
+});
+
+it('runs a first level test', () => {
+  expect(true).toBe(true);
+});
+
+it.todo('is a todo test');
