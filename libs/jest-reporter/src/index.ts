@@ -27,6 +27,7 @@ export default class AllegoriaReporter implements Reporter {
 
   onTestCaseResult(test: Test, testCaseResult: TestCaseResult): void {
     if (!this.enabled) return;
+    if (testCaseResult.status === 'todo') return;
     updateEndTimer(test.path, testCaseResult);
   }
 

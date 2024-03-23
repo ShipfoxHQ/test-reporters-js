@@ -24,7 +24,7 @@ export interface CompletedTestCase {
 }
 
 export interface NonExecutedTestCase {
-  status: 'skipped' | 'pending' | 'todo' | 'disabled' | 'focused';
+  status: 'skipped';
 }
 
 export interface TestSuite {
