@@ -1,0 +1,7 @@
+node_modules/
+src/
+.swcrc
+project.json
+tsconfig.json
+tsconfig.*.json
+*.tsbuildinfo

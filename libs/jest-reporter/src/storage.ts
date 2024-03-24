@@ -1,31 +1,40 @@
 import type {TestCaseResult} from '@jest/test-result';
 
-interface TestData {
-  startedAt?: number;
-  finishedAt?: number;
+interface StartedTestData {
+  startedAt: number;
 }
 
-const testData: Record<string, Record<string, TestData>> = {};
-
-export function addTestData(path: string, fullName: string, data: TestData) {
-  if (!testData[path]) testData[path] = {};
-  testData[path][fullName] = {...testData[path][fullName], ...data};
+interface FinishedTestData {
+  startedAt: number;
+  finishedAt: number;
 }
 
-export function getTestData(path: string, fullName: string): TestData {
-  return testData[path]?.[fullName] ?? {};
+const startedTests: Record<string, Record<string, StartedTestData>> = {};
+const finishedTests: Record<string, Record<string, FinishedTestData>> = {};
+
+export function storeStartedTest(path: string, fullName: string, data: StartedTestData) {
+  if (!startedTests[path]) startedTests[path] = {};
+  startedTests[path][fullName] = {...startedTests[path][fullName], ...data};
 }
 
+export function getStartedTest(path: string, fullName: string): StartedTestData {
+  const test = startedTests[path]?.[fullName];
+  if (!test) throw new Error(`Test not found in storage ${path} ${fullName}`);
+  return test;
+}
+
+export function storeFinishedTest(path: string, fullName: string, data: FinishedTestData) {
+  if (!finishedTests[path]) finishedTests[path] = {};
+  finishedTests[path][fullName] = {...finishedTests[path][fullName], ...data};
+}
+
+export function getFinishedTest(path: string, fullName: string): FinishedTestData {
+  const test = finishedTests[path]?.[fullName];
+  if (!test) throw new Error(`Test not found in storage ${path} ${fullName}`);
+  return test;
+}
 export function updateEndTimer(path: string, result: TestCaseResult) {
-  const newDate = calculateEndTimer(path, result);
-  addTestData(path, result.fullName, newDate);
-}
-
-function calculateEndTimer(path: string, result: TestCaseResult): TestData {
-  const now = Date.now();
-  if (!result.duration) return {finishedAt: now};
-
-  const {startedAt} = getTestData(path, result.fullName);
-  if (startedAt) return {finishedAt: startedAt + result.duration};
-  return {startedAt: now - result.duration, finishedAt: now};
+  if (typeof result.duration !== 'number') throw new Error(`Test duration not found ${path} ${result.fullName}`);
+  const {startedAt} = getStartedTest(path, result.fullName);
+  storeFinishedTest(path, result.fullName, {startedAt, finishedAt: startedAt + result.duration});
 }

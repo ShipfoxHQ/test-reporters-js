@@ -1,6 +1,6 @@
 {
   "name": "@allegoria/workspace",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky"
