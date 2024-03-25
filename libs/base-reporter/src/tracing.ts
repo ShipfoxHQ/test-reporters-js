@@ -41,10 +41,9 @@ export function onError(error: unknown): void {
 let tracer: Tracer | undefined;
 let provider: BasicTracerProvider | undefined;
 
-function mergeOptionsWithEnv(options?: BaseOptions): BaseOptions {
+function mergeOptionsWithEnv(options?: BaseOptions): BaseOptions | undefined {
   const envOptionsStr = process.env.ALLEGORIA_TEST_REPORTER_OPTIONS;
-  if (!envOptionsStr) return {};
-
+  if (!envOptionsStr) return options;
   try {
     const envOptions = JSON.parse(envOptionsStr) as BaseOptions;
     return {
