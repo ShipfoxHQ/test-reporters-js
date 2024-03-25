@@ -1,19 +1,10 @@
 import {relative} from 'node:path';
 import type {TestSuite, TestCase} from '@allegoria/test-reporter-base';
-import type {Task, TaskResult, TaskState, File, Vitest, RunMode} from 'vitest';
+import type {Task, TaskResult, File, Vitest, RunMode} from 'vitest';
 
 type CompletedTaskResult = Omit<TaskResult, 'startTime' | 'duration'> & {
   startTime: NonNullable<TaskResult['startTime']>;
   duration: NonNullable<TaskResult['duration']>;
-};
-
-const stateMap: Record<TaskState, TestCase['status']> = {
-  pass: 'passed',
-  fail: 'failed',
-  run: 'pending',
-  skip: 'skipped',
-  only: 'focused',
-  todo: 'todo',
 };
 
 function getTaskResult(task: Task): CompletedTaskResult {
@@ -68,7 +59,7 @@ export function createDataFromTask(task: Task, ancestors: string[] = []): TestCa
       throw new Error(`Can not handle pending or focused tasks "${task.name}"`);
     return [
       {
-        status: stateMap[consideredMode] as 'skipped',
+        status: 'skipped',
         ancestors,
         name: task.name,
       },
@@ -77,7 +68,7 @@ export function createDataFromTask(task: Task, ancestors: string[] = []): TestCa
   const result = getTaskResult(task);
   return [
     {
-      status: stateMap[result.state] as 'passed' | 'failed',
+      status: result.state === 'pass' ? 'passed' : 'failed',
       ancestors,
       name: task.name,
       start: result.startTime,
