@@ -41,7 +41,30 @@ export function onError(error: unknown): void {
 let tracer: Tracer | undefined;
 let provider: BasicTracerProvider | undefined;
 
-export function init(options?: BaseOptions) {
+function mergeOptionsWithEnv(options?: BaseOptions): BaseOptions | undefined {
+  const envOptionsStr = process.env.ALLEGORIA_TEST_REPORTER_OPTIONS;
+  if (!envOptionsStr) return options;
+  try {
+    const envOptions = JSON.parse(envOptionsStr) as BaseOptions;
+    return {
+      ...options,
+      ...envOptions,
+      exporter: {
+        ...options?.exporter,
+        ...envOptions?.exporter,
+      },
+      buffer: {
+        ...options?.buffer,
+        ...envOptions?.buffer,
+      },
+    };
+  } catch (error) {
+    throw new Error(`Failed to parse options: ${error}`);
+  }
+}
+
+export function init(baseOptions?: BaseOptions) {
+  const options = mergeOptionsWithEnv(baseOptions);
   succeedOnExportFailure = options?.succeedOnExportFailure ?? false;
   setGlobalErrorHandler(onError);
   provider = new BasicTracerProvider({
@@ -49,7 +72,7 @@ export function init(options?: BaseOptions) {
       [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'jest',
     }),
   });
-  const exporterConfig = {
+  const exporterConfig: OTLPExporterNodeConfigBase = {
     compression: CompressionAlgorithm.GZIP,
     ...options?.exporter,
   };
