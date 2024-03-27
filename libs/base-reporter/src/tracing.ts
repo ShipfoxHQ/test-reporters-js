@@ -13,18 +13,9 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 import type {BufferConfig} from '@opentelemetry/sdk-trace-base';
 import {SEMRESATTRS_PROCESS_RUNTIME_NAME} from '@opentelemetry/semantic-conventions';
+import {getOptions} from './utils';
 
 let succeedOnExportFailure = false;
-
-export interface BaseOptions {
-  useHttp?: boolean;
-  disableCompression?: boolean;
-  exporter?: OTLPExporterNodeConfigBase;
-  buffer?: BufferConfig;
-  debug?: boolean;
-  /** By default failing to export test results will fail the test run, enable this option to make it succeed */
-  succeedOnExportFailure?: boolean;
-}
 
 export function onError(error: unknown): void {
   if (error instanceof AggregateError) {
@@ -41,30 +32,8 @@ export function onError(error: unknown): void {
 let tracer: Tracer | undefined;
 let provider: BasicTracerProvider | undefined;
 
-function mergeOptionsWithEnv(options?: BaseOptions): BaseOptions | undefined {
-  const envOptionsStr = process.env.ALLEGORIA_TEST_REPORTER_OPTIONS;
-  if (!envOptionsStr) return options;
-  try {
-    const envOptions = JSON.parse(envOptionsStr) as BaseOptions;
-    return {
-      ...options,
-      ...envOptions,
-      exporter: {
-        ...options?.exporter,
-        ...envOptions?.exporter,
-      },
-      buffer: {
-        ...options?.buffer,
-        ...envOptions?.buffer,
-      },
-    };
-  } catch (error) {
-    throw new Error(`Failed to parse options: ${error}`);
-  }
-}
-
-export function init(baseOptions?: BaseOptions) {
-  const options = mergeOptionsWithEnv(baseOptions);
+export function initTracing() {
+  const options = getOptions();
   succeedOnExportFailure = options?.succeedOnExportFailure ?? false;
   setGlobalErrorHandler(onError);
   provider = new BasicTracerProvider({

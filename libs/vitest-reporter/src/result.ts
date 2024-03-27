@@ -4,7 +4,7 @@ import type {Task, TaskResult, File, Vitest, RunMode} from 'vitest';
 
 type CompletedTaskResult = Omit<TaskResult, 'startTime' | 'duration'> & {
   startTime: NonNullable<TaskResult['startTime']>;
-  duration: NonNullable<TaskResult['duration']>;
+  duration?: NonNullable<TaskResult['duration']>;
 };
 
 function getTaskResult(task: Task): CompletedTaskResult {
@@ -12,8 +12,6 @@ function getTaskResult(task: Task): CompletedTaskResult {
   if (!result) throw new Error(`Task result not found "${task.name}"`);
   if (typeof result.startTime !== 'number')
     throw new Error(`Task start time not found "${task.name}"`);
-  if (typeof result.duration !== 'number')
-    throw new Error(`Task duration not found "${task.name}"`);
   return result as CompletedTaskResult;
 }
 
@@ -25,12 +23,10 @@ function getLocalPath(path: string, context: Vitest): string {
 export function createDataFromFile(file: File, context: Vitest): TestSuite {
   const result = getTaskResult(file);
 
-  if (file.mode !== 'run')
-    throw new Error(`File was reported but not executed not found "${file.filepath}"`);
   return {
     path: getLocalPath(file.filepath, context),
     start: result.startTime,
-    end: result.startTime + result.duration,
+    end: result.startTime + (result.duration ?? 0),
     tests: file.tasks.map((task) => createDataFromTask(task)).flat(),
   };
 }
@@ -72,7 +68,7 @@ export function createDataFromTask(task: Task, ancestors: string[] = []): TestCa
       ancestors,
       name: task.name,
       start: result.startTime,
-      end: result.startTime + result.duration,
+      end: result.startTime + (result.duration ?? 0),
       retries: task.retry ?? 0,
       retryReasons: [],
       failureMessages: [],
