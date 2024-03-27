@@ -8,6 +8,7 @@ import {
   type TimeInput,
 } from '@opentelemetry/api';
 import {getTracer, shutdown} from './tracing';
+import {TEST_RUN_START_KEY, getTiming} from './utils';
 
 export type TestCase = (CompletedTestCase | NonExecutedTestCase) & {
   name: string;
@@ -45,36 +46,37 @@ export async function sendTestRun(run: TestRun): Promise<void> {
   await shutdown();
 }
 
-export function createTestRunSpan(run: TestRun): Span {
+export function createTestRunSpan(run: TestRun): Span[] {
   const tracer = getTracer();
+  const parentContext = ROOT_CONTEXT;
+  const {startTime, endTime} = getTiming(run, parentContext);
   const span = tracer.startSpan(
     'Test run',
     {
-      startTime: run.start,
+      startTime,
       attributes: {
         'allegoria.type': 'test.run',
       },
     },
-    ROOT_CONTEXT,
+    parentContext,
   );
-  const context = trace.setSpan(ROOT_CONTEXT, span);
-  run.suites.forEach((suite) => {
-    createTestSuiteSpan(suite, context, tracer);
-  });
-  span.end(run.end);
-  return span;
+  const context = trace.setSpan(ROOT_CONTEXT, span).setValue(TEST_RUN_START_KEY, run.start);
+  const children = run.suites.map((suite) => createTestSuiteSpan(suite, context, tracer)).flat();
+  span.end(endTime);
+  return [span, ...children];
 }
 
 export function createTestSuiteSpan(
   suite: TestSuite,
   parentContext: Context,
   tracer: Tracer,
-): Span {
+): Span[] {
+  const {startTime, endTime} = getTiming(suite, parentContext);
   const span = tracer.startSpan(
     suite.path,
     {
       kind: SpanKind.INTERNAL,
-      startTime: suite.start,
+      startTime,
       attributes: {
         'allegoria.type': 'test.suite',
         'test.suite.path': suite.path,
@@ -84,22 +86,23 @@ export function createTestSuiteSpan(
   );
 
   const context = trace.setSpan(parentContext, span);
-  suite.tests.forEach((test) => createTestCaseSpan(test, context, tracer));
-  span.end(suite.end);
-  return span;
+  const children = suite.tests.map((test) => createTestCaseSpan(test, context, tracer));
+  span.end(endTime);
+  return [span, ...children];
 }
 
 export function createTestCaseSpan(test: TestCase, parentContext: Context, tracer: Tracer): Span {
+  const {startTime, endTime} = getTiming(test, parentContext);
   const span = tracer.startSpan(
     test.name,
     {
       kind: SpanKind.INTERNAL,
-      startTime: 'start' in test ? test.start : 0,
+      startTime,
       attributes: getTestCaseSpanAttributes(test),
     },
     parentContext,
   );
-  span.end('end' in test ? test.end : 0);
+  span.end(endTime);
   return span;
 }
 
