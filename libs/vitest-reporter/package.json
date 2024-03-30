@@ -13,6 +13,7 @@
   "main": "dist/index.js",
   "types": "src/index.ts",
   "publishConfig": {
+    "access": "public",
     "types": "dist/index.d.ts"
   },
   "scripts": {
