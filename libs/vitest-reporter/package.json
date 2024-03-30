@@ -1,7 +1,8 @@
 {
   "name": "@allegoria/vitest-reporter",
   "license": "Apache-2.0",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": false,
   "main": "dist/index.js",
   "types": "src/index.ts",
   "publishConfig": {
