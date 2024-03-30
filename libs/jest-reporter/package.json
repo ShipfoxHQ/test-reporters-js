@@ -3,6 +3,13 @@
   "license": "Apache-2.0",
   "version": "0.1.0",
   "private": false,
+  "bugs": {
+    "url": "https://github.com/AllegoriaHQ/test-reporters-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AllegoriaHQ/test-reporters-js.git"
+  },
   "main": "dist/index.js",
   "types": "src/index.ts",
   "publishConfig": {
