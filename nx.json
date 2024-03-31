@@ -27,6 +27,15 @@
         "cwd": "{projectRoot}"
       }
     },
+    "publish": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["pnpm publish --force --no-git-checks"],
+        "cwd": "{projectRoot}"
+      }
+    },
     "@nx/eslint:lint": {
       "cache": true,
       "outputs": ["{workspaceRoot}/.eslintcache"],
