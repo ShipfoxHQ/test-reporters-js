@@ -109,7 +109,7 @@ importers:
   libs/jest-reporter:
     dependencies:
       '@allegoria/test-reporter-base':
-        specifier: 0.1.1-1
+        specifier: workspace:^
         version: link:../base-reporter
       '@jest/reporters':
         specifier: ^29.7.0
@@ -134,7 +134,7 @@ importers:
   libs/vitest-reporter:
     dependencies:
       '@allegoria/test-reporter-base':
-        specifier: 0.1.1-1
+        specifier: workspace:^
         version: link:../base-reporter
       '@jest/reporters':
         specifier: ^29.7.0
