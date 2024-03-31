@@ -121,9 +121,6 @@ importers:
       '@jest/types':
         specifier: ^29.6.3
         version: 29.6.3
-      express]:
-        specifier: link:@types/express]
-        version: link:@types/express]
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.11.27)

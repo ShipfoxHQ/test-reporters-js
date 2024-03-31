@@ -31,7 +31,6 @@
   "devDependencies": {
     "@jest/test-result": "^29.7.0",
     "@jest/types": "^29.6.3",
-    "express]": "link:@types/express]",
     "jest": "^29.7.0",
     "msw": "^2.2.10",
     "vitest": "^1.4.0"
