@@ -6,8 +6,7 @@
   "tags": ["scope:shared"],
   "targets": {
     "test": {
-      "executor": "nx:run-script",
-      "dependsOn": ["build", "^build"]
+      "executor": "nx:run-script"
     },
     "build": {
       "executor": "nx:run-script"

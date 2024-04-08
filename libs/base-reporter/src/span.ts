@@ -10,6 +10,8 @@ import {
 import {getTracer, shutdown} from './tracing';
 import {TEST_RUN_START_KEY, getTiming} from './utils';
 
+const TEST_FILLE_PATH_KEY = Symbol('test.file.path');
+
 export type TestCase = (CompletedTestCase | NonExecutedTestCase) & {
   name: string;
   ancestors: string[];
@@ -85,7 +87,7 @@ export function createTestSuiteSpan(
     parentContext,
   );
 
-  const context = trace.setSpan(parentContext, span);
+  const context = trace.setSpan(parentContext, span).setValue(TEST_FILLE_PATH_KEY, suite.path);
   const children = suite.tests.map((test) => createTestCaseSpan(test, context, tracer));
   span.end(endTime);
   return [span, ...children];
@@ -98,7 +100,7 @@ export function createTestCaseSpan(test: TestCase, parentContext: Context, trace
     {
       kind: SpanKind.INTERNAL,
       startTime,
-      attributes: getTestCaseSpanAttributes(test),
+      attributes: getTestCaseSpanAttributes(test, parentContext),
     },
     parentContext,
   );
@@ -106,12 +108,13 @@ export function createTestCaseSpan(test: TestCase, parentContext: Context, trace
   return span;
 }
 
-function getTestCaseSpanAttributes(test: TestCase) {
+function getTestCaseSpanAttributes(test: TestCase, parentContext: Context) {
   const attributes = {
     'allegoria.type': 'test.case',
     'test.case.name': test.name,
     'test.case.ancestors.title': test.ancestors,
     'test.case.status': test.status,
+    'test.suite.path': parentContext.getValue(TEST_FILLE_PATH_KEY) as string,
   };
   if (test.status !== 'failed' && test.status !== 'passed') return attributes;
   return {
