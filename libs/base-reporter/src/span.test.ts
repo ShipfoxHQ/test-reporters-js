@@ -1,3 +1,4 @@
+import {faker} from '@faker-js/faker';
 import {describe, it, beforeEach, expect} from 'vitest';
 import {genTestRun, genTestSuite, genNonExecutedTestCase, genCompletedTestCase} from '../test';
 import {createTestRunSpan} from './span';
@@ -71,7 +72,7 @@ describe('createTestRunSpan', () => {
     expect(result.endTime).toEqual(expectedEndTime);
   });
 
-  it.only('should set the test span time relatively to the baseTimestamp', () => {
+  it('should set the test span time relatively to the baseTimestamp', () => {
     init({baseTimeStamp: '2009-11-04T03:22:43.000Z'});
 
     const testCase = genCompletedTestCase({
@@ -93,5 +94,20 @@ describe('createTestRunSpan', () => {
     expect(result.startTime).toEqual(expectedStartTime);
     const expectedEndTime = [new Date('2009-11-04T03:23:19.000Z').getTime() / 1000, 132000000];
     expect(result.endTime).toEqual(expectedEndTime);
+  });
+
+  it('propagates the test suite path to the test case', () => {
+    const runStart = new Date('2024-03-25T17:35:17.000Z');
+    const runEnd = new Date('2024-03-25T17:35:17.500Z');
+    const path = faker.system.filePath();
+    const testCase = genNonExecutedTestCase();
+    const testSuite = genTestSuite({path, tests: [testCase]});
+    const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
+
+    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.case');
+    expect(results).toHaveLength(1);
+    const result = results[0];
+    expect(result.attributes['test.suite.path']).toBe(path);
   });
 });

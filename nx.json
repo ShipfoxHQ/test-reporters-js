@@ -12,11 +12,12 @@
     },
     "test": {
       "cache": true,
-      "inputs": ["core", "build", "^core", "^build", "test", "^test"]
+      "inputs": ["core", "test", "^core", "^test"],
+      "dependsOn": ["build", "^build"]
     },
     "typecheck": {
       "cache": true,
-      "inputs": ["core", "build", "test"]
+      "inputs": ["core", "test"]
     },
     "publish:local": {
       "cache": false,
@@ -66,7 +67,11 @@
       "!{projectRoot}/**/*.test.{ts,tsx,js,jsx}",
       "{projectRoot}/tsconfig.build.json"
     ],
-    "test": ["{projectRoot}/**/*.{ts,tsx,js,jsx}", "{projectRoot}/tsconfig.test.json"]
+    "test": [
+      "{projectRoot}/**/*.{ts,tsx,js,jsx}",
+      "{projectRoot}/tsconfig.build.json",
+      "{projectRoot}/tsconfig.test.json"
+    ]
   },
   "affected": {
     "defaultBase": "main"
