@@ -3,7 +3,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "prepare": "husky"
+    "prepare": "husky",
+    "version-libs": "tsx scripts/version-libs.ts",
+    "publish": "nx run-many -t publish"
   },
   "type": "module",
   "devDependencies": {
@@ -26,6 +28,8 @@
     "husky": "^9.0.11",
     "nx": "^18.0.8",
     "prettier": "^3.2.5",
-    "typescript": "~5.4.2"
+    "tsx": "^4.7.2",
+    "typescript": "~5.4.2",
+    "yargs": "^17.7.2"
   }
 }
