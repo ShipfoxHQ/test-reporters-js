@@ -88,7 +88,7 @@ export function collectCIMetadata() {
 
 function removeNullUndefined<T extends object>(obj: T): Partial<T> {
   return Object.entries(obj).reduce((acc, [key, value]) => {
-    if (!value !== null) {
+    if (value) {
       acc[key as keyof T] = value;
     }
     return acc;
