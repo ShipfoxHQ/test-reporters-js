@@ -69,6 +69,24 @@ importers:
         specifier: ~5.4.2
         version: 5.4.3
 
+  examples/jest:
+    devDependencies:
+      '@allegoria/jest-reporter':
+        specifier: workspace:^
+        version: link:../../libs/jest-reporter
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@20.11.27)
+
+  examples/vitest:
+    devDependencies:
+      '@allegoria/vitest-reporter':
+        specifier: workspace:^
+        version: link:../../libs/vitest-reporter
+      vitest:
+        specifier: ^1.4.0
+        version: 1.4.0(@types/node@20.11.27)
+
   libs/base-reporter:
     dependencies:
       '@opentelemetry/api':
