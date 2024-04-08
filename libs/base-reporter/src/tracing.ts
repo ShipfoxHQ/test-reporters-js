@@ -11,8 +11,8 @@ import {
   ConsoleSpanExporter,
   BatchSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import type {BufferConfig} from '@opentelemetry/sdk-trace-base';
 import {SEMRESATTRS_PROCESS_RUNTIME_NAME} from '@opentelemetry/semantic-conventions';
+import {collectCIMetadata} from './ci';
 import {getOptions} from './utils';
 
 let succeedOnExportFailure = false;
@@ -36,9 +36,11 @@ export function initTracing() {
   const options = getOptions();
   succeedOnExportFailure = options?.succeedOnExportFailure ?? false;
   setGlobalErrorHandler(onError);
+  const ciMetadata = collectCIMetadata();
   provider = new BasicTracerProvider({
     resource: new Resource({
       [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'jest',
+      ...ciMetadata,
     }),
   });
   const exporterConfig: OTLPExporterNodeConfigBase = {
