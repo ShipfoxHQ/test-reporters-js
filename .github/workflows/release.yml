@@ -32,9 +32,8 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Get pnpm store directory
-        run: |
-          nix develop --command \
-            echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+        shell: nix develop --command bash {0}
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       # we don't use actions/setup-node because of Nix usage
       - name: Setup pnpm cache
@@ -46,26 +45,22 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: install npm dependencies
-        run: |
-          nix develop --command \
-            pnpm -r install --frozen-lockfile
+        shell: nix develop --command bash {0}
+        run: pnpm -r install --frozen-lockfile
 
       - name: Update packages version
-        run: |
-          nix develop --command \
-            pnpm version-libs --version=${{ github.event.inputs.version }}
+        shell: nix develop --command bash {0}
+        run: pnpm version-libs --version=${{ github.event.inputs.version }}
 
       - name: Dry-run publishing
-        run: |
-          nix develop --command \
-            pnpm nx run-many -t publish --dry-run
+        shell: nix develop --command bash {0}
+        run: pnpm nx run-many -t publish --dry-run
 
       - name: Publish to npm
+        shell: nix develop --command bash {0}
         run: |
-          nix develop --command \
-            pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_ACCESS_TOKEN }}
-          nix develop --command \
-            pnpm nx run-many -t publish
+          pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_ACCESS_TOKEN }}
+          pnpm nx run-many -t publish
 
       - name: Tag
         run: |
