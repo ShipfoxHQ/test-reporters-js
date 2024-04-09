@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.0.0)'
+        required: true
+        type: string
+      otp:
+        description: 'OTP for allegoria-bot npm account'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix flake check
+      - run: nix develop
+
+      - run: pnpm -r install --frozen-lockfile
+
+      - name: Update packages version
+        run: pnpm version-libs -- --version=${{ github.event.inputs.version }}
+
+      - name: Dry-run publishing
+        run: nx run-many -t publish --dry-run
+
+      - name: Publish to npm
+        run: nx run-many -t publish -- --otp ${{ github.event.inputs.otp }}
+
+      - name: Tag
+        run: |
+          TAG=${{ github.event.inputs.version }}
+          git tag ${TAG}
+          git push origin ${TAG}
