@@ -31,10 +31,24 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
+      - name: Get pnpm store directory
+        run: |
+          nix develop --command \
+            echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      # we don't use actions/setup-node because of Nix usage
+      - name: Setup pnpm cache
+        uses: actions/cache@v4.0.2
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: install npm dependencies
         run: |
           nix develop --command \
-          pnpm -r install --frozen-lockfile
+            pnpm -r install --frozen-lockfile
 
       - name: Update packages version
         run: |
