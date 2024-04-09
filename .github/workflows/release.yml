@@ -7,10 +7,6 @@ on:
         description: 'Version (e.g. 1.0.0)'
         required: true
         type: string
-      otp:
-        description: 'OTP for allegoria-bot npm account'
-        required: true
-        type: string
 
 jobs:
   release:
@@ -39,17 +35,19 @@ jobs:
       - name: Update packages version
         run: |
           nix develop --command \
-          pnpm version-libs --version=${{ github.event.inputs.version }}
+            pnpm version-libs --version=${{ github.event.inputs.version }}
 
       - name: Dry-run publishing
         run: |
           nix develop --command \
-          pnpm nx run-many -t publish --dry-run
+            pnpm nx run-many -t publish --dry-run
 
       - name: Publish to npm
         run: |
           nix develop --command \
-          pnpm nx run-many -t publish
+            pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_ACCESS_TOKEN }}
+          nix develop --command \
+            pnpm nx run-many -t publish
 
       - name: Tag
         run: |
