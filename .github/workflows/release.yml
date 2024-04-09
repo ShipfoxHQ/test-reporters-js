@@ -19,24 +19,37 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4.1.1
+      - name: git checkout
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
-      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Check Nixpkgs inputs
+        uses: DeterminateSystems/flake-checker-action@main
+        with:
+          fail-mode: true
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
-      - run: nix flake check
-      - run: nix develop
 
-      - run: pnpm -r install --frozen-lockfile
+      - name: install npm dependencies
+        run: |
+          nix develop --command \
+          pnpm -r install --frozen-lockfile
 
       - name: Update packages version
-        run: pnpm version-libs -- --version=${{ github.event.inputs.version }}
+        run: |
+          nix develop --command \
+          pnpm version-libs --version=${{ github.event.inputs.version }}
 
       - name: Dry-run publishing
-        run: nx run-many -t publish --dry-run
+        run: |
+          nix develop --command \
+          pnpm nx run-many -t publish --dry-run
 
       - name: Publish to npm
-        run: nx run-many -t publish -- --otp ${{ github.event.inputs.otp }}
+        run: |
+          nix develop --command \
+          pnpm nx run-many -t publish
 
       - name: Tag
         run: |
