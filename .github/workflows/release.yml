@@ -8,6 +8,10 @@ on:
         required: true
         type: string
 
+permissions:
+  # allow to push the release tag
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -51,6 +55,7 @@ jobs:
 
       - name: Tag
         run: |
-          TAG=${{ github.event.inputs.version }}
           git tag ${TAG}
           git push origin ${TAG}
+        env:
+          TAG: v${{ github.event.inputs.version }}
