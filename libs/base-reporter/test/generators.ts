@@ -10,6 +10,7 @@ import type {
 export function genTestRun(overrides?: Partial<TestRun>): TestRun {
   const start = faker.date.recent().getTime();
   return {
+    status: 'passed',
     start,
     end: start + faker.number.int(),
     suites: [],
@@ -20,6 +21,7 @@ export function genTestRun(overrides?: Partial<TestRun>): TestRun {
 export function genTestSuite(overrides?: Partial<TestSuite>): TestSuite {
   const start = faker.date.recent().getTime();
   return {
+    status: 'passed',
     start,
     end: start + faker.number.int(),
     path: faker.system.filePath(),
@@ -29,20 +31,22 @@ export function genTestSuite(overrides?: Partial<TestSuite>): TestSuite {
 }
 
 export function genNonExecutedTestCase(overrides?: Partial<NonExecutedTestCase>): TestCase {
+  const title = faker.lorem.words();
   return {
     status: 'skipped',
-    name: faker.lorem.words(),
-    ancestors: [],
+    title,
+    titlePath: [title],
     ...overrides,
   };
 }
 
 export function genCompletedTestCase(overrides?: Partial<CompletedTestCase>): TestCase {
   const start = faker.date.recent().getTime();
+  const title = faker.lorem.words();
   return {
     status: 'passed',
-    name: faker.lorem.words(),
-    ancestors: [],
+    title,
+    titlePath: [title],
     start,
     end: start + faker.number.int(),
     failureMessages: [],

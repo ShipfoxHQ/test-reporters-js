@@ -80,8 +80,8 @@ describe('createDataFromFile', () => {
       const data = createDataFromTask(suite1);
 
       expect(data.length).toBe(1);
-      expect(data[0].name).toBe('test');
-      expect(data[0].ancestors).toEqual(['root', 'middle']);
+      expect(data[0].title).toBe('test');
+      expect(data[0].titlePath).toEqual(['root', 'middle', 'test']);
     });
 
     it('should consider a test skipped if one of his parents is skipped', () => {

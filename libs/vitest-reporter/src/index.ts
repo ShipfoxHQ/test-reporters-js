@@ -28,6 +28,11 @@ export default class AllegoriaReporter implements Reporter {
     if (!context) throw new Error(`Vitest context not found`);
     const end = Date.now();
     const suites = files.map((file) => createDataFromFile(file, context));
-    await sendTestRun({start: this.start, end, suites});
+    await sendTestRun({
+      start: this.start,
+      end,
+      suites,
+      status: suites.some((suite) => suite.status === 'failed') ? 'failed' : 'passed',
+    });
   }
 }

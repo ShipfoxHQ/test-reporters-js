@@ -40,7 +40,7 @@ function getRealTiming(
   }
   const start = getTestRunStartTime(context);
   if (!start)
-    throw new Error(`Could not get non executed test start time from context [${span.name}]`);
+    throw new Error(`Could not get non executed test start time from context [${span.title}]`);
   return {
     startTime: start,
     endTime: start,

@@ -25,7 +25,7 @@ describe('createTestRunSpan', () => {
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.case');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
 
     const result = results[0];
@@ -43,7 +43,7 @@ describe('createTestRunSpan', () => {
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.run');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.run');
 
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -62,7 +62,7 @@ describe('createTestRunSpan', () => {
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.run');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.run');
 
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -87,7 +87,7 @@ describe('createTestRunSpan', () => {
     });
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.case');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
     const result = results[0];
     const expectedStartTime = [new Date('2009-11-04T03:23:18.000Z').getTime() / 1000, 255000000];
@@ -105,7 +105,7 @@ describe('createTestRunSpan', () => {
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.case');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
     const result = results[0];
     expect(result.attributes['test.suite.path']).toBe(path);

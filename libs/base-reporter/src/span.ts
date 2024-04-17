@@ -12,9 +12,11 @@ import {TEST_RUN_START_KEY, getTiming} from './utils';
 
 const TEST_FILLE_PATH_KEY = Symbol('test.file.path');
 
+export type ExecutionStatus = 'passed' | 'failed' | 'skipped';
+
 export type TestCase = (CompletedTestCase | NonExecutedTestCase) & {
-  name: string;
-  ancestors: string[];
+  title: string;
+  titlePath: string[];
 };
 
 export interface CompletedTestCase {
@@ -35,12 +37,14 @@ export interface TestSuite {
   end: TimeInput;
   tests: TestCase[];
   path: string;
+  status: ExecutionStatus;
 }
 
 export interface TestRun {
   start: TimeInput;
   end: TimeInput;
   suites: TestSuite[];
+  status: ExecutionStatus;
 }
 
 export async function sendTestRun(run: TestRun): Promise<void> {
@@ -57,7 +61,8 @@ export function createTestRunSpan(run: TestRun): Span[] {
     {
       startTime,
       attributes: {
-        'allegoria.type': 'test.run',
+        'execution.type': 'test.run',
+        'execution.status': run.status,
       },
     },
     parentContext,
@@ -80,7 +85,8 @@ export function createTestSuiteSpan(
       kind: SpanKind.INTERNAL,
       startTime,
       attributes: {
-        'allegoria.type': 'test.suite',
+        'execution.type': 'test.suite',
+        'execution.status': suite.status,
         'test.suite.path': suite.path,
       },
     },
@@ -96,7 +102,7 @@ export function createTestSuiteSpan(
 export function createTestCaseSpan(test: TestCase, parentContext: Context, tracer: Tracer): Span {
   const {startTime, endTime} = getTiming(test, parentContext);
   const span = tracer.startSpan(
-    test.name,
+    test.title,
     {
       kind: SpanKind.INTERNAL,
       startTime,
@@ -110,10 +116,10 @@ export function createTestCaseSpan(test: TestCase, parentContext: Context, trace
 
 function getTestCaseSpanAttributes(test: TestCase, parentContext: Context) {
   const attributes = {
-    'allegoria.type': 'test.case',
-    'test.case.name': test.name,
-    'test.case.ancestors.title': test.ancestors,
-    'test.case.status': test.status,
+    'execution.type': 'test.case',
+    'execution.status': test.status,
+    'test.case.title': test.title,
+    'test.case.titlePath': test.titlePath,
     'test.suite.path': parentContext.getValue(TEST_FILLE_PATH_KEY) as string,
   };
   if (test.status !== 'failed' && test.status !== 'passed') return attributes;
