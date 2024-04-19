@@ -9,7 +9,7 @@ import {
   OSTYPEVALUES_DARWIN,
   OSTYPEVALUES_LINUX,
 } from '@opentelemetry/semantic-conventions';
-import {hash16, hash32} from './utils';
+import {hash16HexDigits, hash32HexDigits} from './utils';
 
 const CI_PROVIDER = 'ci.provider';
 
@@ -87,21 +87,21 @@ export function getCiMetadata(): CiMetadata {
     } = process.env;
 
     const rawContextId = `github-${GITHUB_REPOSITORY_ID}-${GITHUB_WORKFLOW}-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}`;
-    const contextId = hash32(rawContextId);
+    const contextId = hash32HexDigits(rawContextId);
 
     const spanAttributes = {
       [CI_PROVIDER]: 'github',
-      [CI_PIPELINE_ID]: hash32(`github-${GITHUB_WORKFLOW}`),
+      [CI_PIPELINE_ID]: hash32HexDigits(`github-${GITHUB_WORKFLOW}`),
       [CI_PIPELINE_NAME]: GITHUB_WORKFLOW,
       [CI_PIPELINE_URL]: `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT}`,
-      [CI_PIPELINE_EXECUTION_ID]: hash16(rawContextId),
+      [CI_PIPELINE_EXECUTION_ID]: hash16HexDigits(rawContextId),
       [CI_PIPELINE_EXECUTION_NAME]: GITHUB_ACTION,
       [CI_PIPELINE_EXECUTION_NUMBER]: GITHUB_RUN_NUMBER,
       [CI_PIPELINE_EXECUTION_URL]: `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/workflows/${GITHUB_WORKFLOW}`,
       [CI_PIPELINE_EXECUTION_ATTEMPT]: GITHUB_RUN_ATTEMPT,
-      [CI_JOB_ID]: hash32(`github-${GITHUB_WORKFLOW}-${GITHUB_JOB}`),
+      [CI_JOB_ID]: hash32HexDigits(`github-${GITHUB_WORKFLOW}-${GITHUB_JOB}`),
       [CI_JOB_NAME]: GITHUB_JOB,
-      [CI_JOB_EXECUTION_ID]: hash16([rawContextId, 'GITHUB_JOB'].join('-')),
+      [CI_JOB_EXECUTION_ID]: hash16HexDigits([rawContextId, 'GITHUB_JOB'].join('-')),
     };
 
     const resourceAttributes = {
@@ -110,7 +110,7 @@ export function getCiMetadata(): CiMetadata {
       [GIT_PROVIDER]: 'github',
       [GIT_REPOSITORY_NAME]: GITHUB_REPOSITORY,
       [GIT_REPOSITORY_URL]: `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}`,
-      [GIT_REPOSITORY_ID]: hash16(`github-${GITHUB_REPOSITORY_ID}`),
+      [GIT_REPOSITORY_ID]: hash16HexDigits(`github-${GITHUB_REPOSITORY_ID}`),
       [GIT_REPOSITORY_PROVIDER_ID]: GITHUB_REPOSITORY_ID,
       [GIT_REF]: GITHUB_REF,
       [GIT_REF_NAME]: GITHUB_REF_NAME,
