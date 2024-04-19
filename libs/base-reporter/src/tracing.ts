@@ -48,12 +48,12 @@ export function getIdGenerator(): IdGenerator {
   return idGenerator;
 }
 
-export interface RunnerAttributes {
+export interface RuntimeAttributes {
   runner: {name: string; version?: string};
   reporter: {name: string; version?: string};
 }
 
-export function initTracing(attributes: RunnerAttributes) {
+export function initTracing(attributes: RuntimeAttributes) {
   tracer = undefined;
   provider = undefined;
   const options = getOptions();

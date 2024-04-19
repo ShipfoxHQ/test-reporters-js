@@ -4,7 +4,7 @@ import {describe, it, beforeEach, expect, vi} from 'vitest';
 import {genTestRun, genTestSuite, genNonExecutedTestCase, genCompletedTestCase} from '../test';
 import * as ci from './ci';
 import {createTestRunSpan} from './span';
-import type {RunnerAttributes} from './tracing';
+import type {RuntimeAttributes} from './tracing';
 import {init} from './index';
 interface TestSpan {
   name: string;
@@ -18,7 +18,7 @@ interface TestSpan {
   };
 }
 
-const testRunnerAttrs: RunnerAttributes = {
+const testRunnerAttrs: RuntimeAttributes = {
   runner: {name: 'test-runner', version: '1.0.0'},
   reporter: {name: 'test-reporter', version: '1.0.0'},
 };
