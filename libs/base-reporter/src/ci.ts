@@ -86,7 +86,7 @@ export function getCiMetadata(): CiMetadata {
       RUNNER_OS,
     } = process.env;
 
-    const rawContextId = `github-${GITHUB_WORKFLOW}-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}`;
+    const rawContextId = `github-${GITHUB_REPOSITORY_ID}-${GITHUB_WORKFLOW}-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}`;
     const contextId = hash32(rawContextId);
 
     const spanAttributes = {
