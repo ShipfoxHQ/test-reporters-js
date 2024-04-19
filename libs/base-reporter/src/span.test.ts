@@ -12,6 +12,7 @@ interface TestSpan {
   endTime: [number, number];
   duration: number;
   attributes: Record<string, unknown>;
+  resource: {_attributes: Record<string, unknown>};
   _spanContext: {
     traceId: string;
   };
@@ -133,6 +134,27 @@ describe('createTestRunSpan', () => {
 
     for (const span of spans) {
       expect(span.attributes['some.random.attribute']).toBe('test');
+    }
+  });
+
+  it('propagates resource attributes from CI', () => {
+    vi.spyOn(ci, 'getCiMetadata').mockReturnValue({
+      contextId: undefined,
+      resourceAttributes: {
+        'some.resource.attribute': 'test',
+      },
+      spanAttributes: {},
+    });
+    const testRun = genTestRun({
+      suites: [genTestSuite({tests: [genNonExecutedTestCase(), genCompletedTestCase()]})],
+    });
+
+    init();
+    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    expect(spans).toHaveLength(4);
+
+    for (const span of spans) {
+      expect(span.resource._attributes['some.resource.attribute']).toBe('test');
     }
   });
 
