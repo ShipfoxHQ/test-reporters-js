@@ -1,4 +1,3 @@
-import {trace, type Tracer} from '@opentelemetry/api';
 import {setGlobalErrorHandler} from '@opentelemetry/core';
 import {OTLPTraceExporter as HttpOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
 import {OTLPTraceExporter as ProtoOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-proto';
@@ -10,9 +9,12 @@ import {
   SimpleSpanProcessor,
   ConsoleSpanExporter,
   BatchSpanProcessor,
+  RandomIdGenerator,
+  type IdGenerator,
+  type Tracer,
 } from '@opentelemetry/sdk-trace-base';
 import {SEMRESATTRS_PROCESS_RUNTIME_NAME} from '@opentelemetry/semantic-conventions';
-import {collectCIMetadata} from './ci';
+import {getCiMetadata} from './ci';
 import {getOptions} from './utils';
 
 let succeedOnExportFailure = false;
@@ -32,15 +34,31 @@ export function onError(error: unknown): void {
 let tracer: Tracer | undefined;
 let provider: BasicTracerProvider | undefined;
 
+/** Returns a random ID generator, that can return deterministic trace IDs when running in CI context */
+export function getIdGenerator(): IdGenerator {
+  const {contextId} = getCiMetadata();
+  const idGenerator = new RandomIdGenerator();
+  if (contextId)
+    idGenerator.generateTraceId = () => {
+      return contextId;
+    };
+  return idGenerator;
+}
+
 export function initTracing() {
+  tracer = undefined;
+  provider = undefined;
   const options = getOptions();
   succeedOnExportFailure = options?.succeedOnExportFailure ?? false;
   setGlobalErrorHandler(onError);
-  const ciMetadata = collectCIMetadata();
+  const {resourceAttributes} = getCiMetadata();
+  const idGenerator = getIdGenerator();
+
   provider = new BasicTracerProvider({
+    idGenerator,
     resource: new Resource({
       [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'jest',
-      ...ciMetadata,
+      ...resourceAttributes,
     }),
   });
   const exporterConfig: OTLPExporterNodeConfigBase = {
@@ -53,8 +71,8 @@ export function initTracing() {
   provider.addSpanProcessor(new BatchSpanProcessor(exporter, options?.buffer));
   if (options?.debug) provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
   provider.register();
+  tracer = provider.getTracer('allegoria');
 
-  tracer = trace.getTracer('@allegoria/jest-reporter');
   return {provider, exporter, tracer};
 }
 

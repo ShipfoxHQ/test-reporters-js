@@ -1,6 +1,6 @@
 import {relative} from 'node:path';
-import type {TestSuite, TestCase} from '@allegoria/test-reporter-base';
-import type {Task, TaskResult, File, Vitest, RunMode} from 'vitest';
+import type {TestSuite, TestCase, ExecutionStatus} from '@allegoria/test-reporter-base';
+import type {Task, TaskResult, File, Vitest, RunMode, Suite} from 'vitest';
 
 type CompletedTaskResult = Omit<TaskResult, 'startTime' | 'duration'> & {
   startTime: NonNullable<TaskResult['startTime']>;
@@ -20,14 +20,21 @@ function getLocalPath(path: string, context: Vitest): string {
   return relative(root, path);
 }
 
+export function getSuiteStatus(suite: Suite): ExecutionStatus {
+  if (suite.result?.state === 'skip') return 'skipped';
+  if (suite.result?.state === 'pass') return 'passed';
+  return 'failed';
+}
+
 export function createDataFromFile(file: File, context: Vitest): TestSuite {
   const result = getTaskResult(file);
-
+  const tests = file.tasks.map((task) => createDataFromTask(task)).flat();
   return {
     path: getLocalPath(file.filepath, context),
     start: result.startTime,
     end: result.startTime + (result.duration ?? 0),
-    tests: file.tasks.map((task) => createDataFromTask(task)).flat(),
+    tests,
+    status: getSuiteStatus(file),
   };
 }
 
@@ -39,14 +46,13 @@ function getParentMode(task: Task): RunMode {
   return 'run';
 }
 
-export function createDataFromTask(task: Task, ancestors: string[] = []): TestCase[] {
+export function createDataFromTask(task: Task, parentTitlePath: string[] = []): TestCase[] {
+  const titlePath = [...parentTitlePath, task.name];
   if (task.type === 'custom') throw new Error(`Can not handle custom task "${task.name}"`);
   // Do not report any todo test
   if (task.mode === 'todo') return [];
   if (task.type === 'suite') {
-    return task.tasks
-      .map((subTask) => createDataFromTask(subTask, [...ancestors, task.name]))
-      .flat();
+    return task.tasks.map((subTask) => createDataFromTask(subTask, titlePath)).flat();
   }
   const parentMode = getParentMode(task);
   if (task.mode !== 'run' || parentMode !== 'run') {
@@ -56,8 +62,8 @@ export function createDataFromTask(task: Task, ancestors: string[] = []): TestCa
     return [
       {
         status: 'skipped',
-        ancestors,
-        name: task.name,
+        titlePath,
+        title: task.name,
       },
     ];
   }
@@ -65,8 +71,8 @@ export function createDataFromTask(task: Task, ancestors: string[] = []): TestCa
   return [
     {
       status: result.state === 'pass' ? 'passed' : 'failed',
-      ancestors,
-      name: task.name,
+      titlePath,
+      title: task.name,
       start: result.startTime,
       end: result.startTime + (result.duration ?? 0),
       retries: task.retry ?? 0,

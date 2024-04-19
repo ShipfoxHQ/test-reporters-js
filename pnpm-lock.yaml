@@ -122,6 +122,9 @@ importers:
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
+      xxhash-addon:
+        specifier: ^2.0.3
+        version: 2.0.3
     devDependencies:
       '@faker-js/faker':
         specifier: ^8.4.1
@@ -8308,6 +8311,12 @@ packages:
     dependencies:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
+
+  /xxhash-addon@2.0.3:
+    resolution: {integrity: sha512-MIL+yTvK2HaVHe1VXfVtXd884pakIaNbjuNHAqIhVFrye87+ZCn0s3RSafqiYB1ASqrZoGsm8URjPiupGLuP+A==}
+    engines: {node: '>=8.6.0 <9.0.0 || >=10.0.0'}
+    requiresBuild: true
+    dev: false
 
   /y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}

@@ -9,6 +9,7 @@ export function mapTestRun(results: AggregatedResult, globalConfig: Config.Globa
   const testSuiteEnd = Date.now();
   const suites = results.testResults.map((result) => mapTestSuite(result, globalConfig));
   return {
+    status: results.numFailedTestSuites > 0 ? 'failed' : 'passed',
     start: results.startTime,
     end: testSuiteEnd,
     suites,
@@ -20,7 +21,9 @@ export function mapTestSuite(result: TestResult, globalConfig: Config.GlobalConf
   const tests = result.testResults
     .filter((testCase) => testCase.status !== 'todo')
     .map((caseResult) => mapTestCase(caseResult, result));
+
   return {
+    status: result.numFailingTests > 0 ? 'failed' : 'passed',
     start: result.perfStats.start,
     end: result.perfStats.end,
     path,
@@ -30,8 +33,8 @@ export function mapTestSuite(result: TestResult, globalConfig: Config.GlobalConf
 
 export function mapTestCase(result: AssertionResult, testSuiteResult: TestResult): TestCase {
   const baseData = {
-    name: result.title,
-    ancestors: result.ancestorTitles,
+    title: result.title,
+    titlePath: [...result.ancestorTitles, result.title],
   };
 
   if (result.status === 'pending')

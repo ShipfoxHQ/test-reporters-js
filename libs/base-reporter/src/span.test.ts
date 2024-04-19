@@ -1,6 +1,8 @@
+import {randomBytes} from 'node:crypto';
 import {faker} from '@faker-js/faker';
-import {describe, it, beforeEach, expect} from 'vitest';
+import {describe, it, beforeEach, expect, vi} from 'vitest';
 import {genTestRun, genTestSuite, genNonExecutedTestCase, genCompletedTestCase} from '../test';
+import * as ci from './ci';
 import {createTestRunSpan} from './span';
 import {init} from './index';
 
@@ -10,6 +12,10 @@ interface TestSpan {
   endTime: [number, number];
   duration: number;
   attributes: Record<string, unknown>;
+  resource: {_attributes: Record<string, unknown>};
+  _spanContext: {
+    traceId: string;
+  };
 }
 
 describe('createTestRunSpan', () => {
@@ -25,7 +31,7 @@ describe('createTestRunSpan', () => {
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.case');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
 
     const result = results[0];
@@ -43,7 +49,7 @@ describe('createTestRunSpan', () => {
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.run');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.run');
 
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -62,7 +68,7 @@ describe('createTestRunSpan', () => {
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.run');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.run');
 
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -87,7 +93,7 @@ describe('createTestRunSpan', () => {
     });
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.case');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
     const result = results[0];
     const expectedStartTime = [new Date('2009-11-04T03:23:18.000Z').getTime() / 1000, 255000000];
@@ -105,9 +111,70 @@ describe('createTestRunSpan', () => {
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    const results = spans.filter((span) => span.attributes['allegoria.type'] === 'test.case');
+    const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
     const result = results[0];
     expect(result.attributes['test.suite.path']).toBe(path);
+  });
+
+  it('propagates span attributes from CI', () => {
+    vi.spyOn(ci, 'getCiMetadata').mockReturnValue({
+      contextId: undefined,
+      resourceAttributes: {},
+      spanAttributes: {
+        'some.random.attribute': 'test',
+      },
+    });
+    const testRun = genTestRun({
+      suites: [genTestSuite({tests: [genNonExecutedTestCase(), genCompletedTestCase()]})],
+    });
+
+    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    expect(spans).toHaveLength(4);
+
+    for (const span of spans) {
+      expect(span.attributes['some.random.attribute']).toBe('test');
+    }
+  });
+
+  it('propagates resource attributes from CI', () => {
+    vi.spyOn(ci, 'getCiMetadata').mockReturnValue({
+      contextId: undefined,
+      resourceAttributes: {
+        'some.resource.attribute': 'test',
+      },
+      spanAttributes: {},
+    });
+    const testRun = genTestRun({
+      suites: [genTestSuite({tests: [genNonExecutedTestCase(), genCompletedTestCase()]})],
+    });
+
+    init();
+    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    expect(spans).toHaveLength(4);
+
+    for (const span of spans) {
+      expect(span.resource._attributes['some.resource.attribute']).toBe('test');
+    }
+  });
+
+  it('propagates trace ID from CI', () => {
+    const contextId = randomBytes(16).toString('hex');
+    vi.spyOn(ci, 'getCiMetadata').mockReturnValue({
+      contextId,
+      resourceAttributes: {},
+      spanAttributes: {},
+    });
+    const testRun = genTestRun({
+      suites: [genTestSuite({tests: [genNonExecutedTestCase(), genCompletedTestCase()]})],
+    });
+
+    init();
+    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    expect(spans).toHaveLength(4);
+
+    for (const span of spans) {
+      expect(span['_spanContext']['traceId']).toBe(contextId);
+    }
   });
 });
