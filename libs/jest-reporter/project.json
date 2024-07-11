@@ -10,7 +10,7 @@
     "build": {
       "executor": "nx:run-script"
     },
-    "publish:local": {},
-    "publish": {}
+    "publish": {},
+    "version": {}
   }
 }

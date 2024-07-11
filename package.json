@@ -3,9 +3,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "prepare": "husky",
-    "version-libs": "tsx scripts/version-libs.ts",
-    "publish": "nx run-many -t publish"
+    "prepare": "husky"
   },
   "type": "module",
   "devDependencies": {
