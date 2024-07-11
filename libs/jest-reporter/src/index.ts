@@ -29,6 +29,7 @@ export default class AllegoriaReporter implements Reporter {
   }
 
   async onRunStart(): Promise<void> {
+    if (!this.enabled) return;
     await init({
       runner: {name: 'jest', version: getPackageVersion('jest')},
       reporter: {
