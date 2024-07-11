@@ -2,12 +2,12 @@
   "name": "@allegoria/test-reporter-vitest-example",
   "license": "Apache-2.0",
   "version": "1.0.0",
-  "private" : true,
+  "private": true,
   "scripts": {
     "test": "vitest run"
   },
   "devDependencies": {
     "@allegoria/vitest-reporter": "workspace:^",
-    "vitest": "^1.4.0"
+    "vitest": "^1.6.0"
   }
 }
