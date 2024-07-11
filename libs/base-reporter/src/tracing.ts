@@ -47,6 +47,7 @@ export function initTracing(oidcToken: string, attributes: RuntimeAttributes) {
   });
   const exporterConfig: OTLPExporterNodeConfigBase = {
     compression: CompressionAlgorithm.GZIP,
+    url: 'https://otlp.allegoria.io:4318/v1/traces',
     headers: {
       Authorization: `Bearer ${oidcToken}`,
     },
