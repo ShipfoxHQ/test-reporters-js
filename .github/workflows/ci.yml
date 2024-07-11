@@ -6,12 +6,8 @@ on:
       - main
   pull_request: {}
 
-permissions:
-  # allow to push the release tag
-  contents: write
-
 jobs:
-  release:
+  ci:
     runs-on: ubuntu-latest
 
     timeout-minutes: 60
