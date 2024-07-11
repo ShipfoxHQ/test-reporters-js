@@ -1,6 +1,7 @@
 import {join} from 'path';
 import {
   type BaseOptions,
+  setOptions,
   init,
   sendTestRun,
   getPackageVersion,
@@ -24,8 +25,11 @@ export default class AllegoriaReporter implements Reporter {
     this.enabled = options?.enabled ?? true;
     this.globalConfig = globalConfig;
     if (!this.enabled) return;
-    init({
-      ...options,
+    setOptions(options);
+  }
+
+  async onRunStart(): Promise<void> {
+    await init({
       runner: {name: 'jest', version: getPackageVersion('jest')},
       reporter: {
         name: '@allegoria/jest-reporter',

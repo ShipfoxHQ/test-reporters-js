@@ -10,6 +10,7 @@ describe('VitestReporter', () => {
   beforeAll(() => {
     apiCall = vi.fn();
     server = setupServer(
+      http.get('https://api.allegoria.io/oidc/token', () => HttpResponse.json({token: 'token'})),
       http.post('http://localhost:4318/v1/traces', async ({request}) => {
         const body = await request.json();
         apiCall(body);
@@ -26,7 +27,9 @@ describe('VitestReporter', () => {
   it('should send traces', async () => {
     const vitest = await startVitest('test', [], {
       silent: true,
-      reporters: [['src/index.ts', {useHttp: true, exporter: {compression: 'none'}}]],
+      reporters: [
+        ['src/index.ts', {apiKey: 'testApiKey', useHttp: true, exporter: {compression: 'none'}}],
+      ],
       include: ['../../examples/vitest/src/**/*.test.js'],
     });
     await vitest?.close();
