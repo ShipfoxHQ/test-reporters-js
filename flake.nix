@@ -20,8 +20,8 @@
             # The Nix packages provided in the environment
             packages = with pkgs; [
               # Node
-              nodejs_21
-              nodePackages.pnpm
+              nodePackage
+              pkgs.nodePackages.pnpm
             ];
           };
         };

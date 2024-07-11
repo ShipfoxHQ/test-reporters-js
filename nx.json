@@ -41,11 +41,11 @@
       "cache": true,
       "outputs": ["{workspaceRoot}/.eslintcache"],
       "inputs": [
-        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/eslint.config.js",
         "{workspaceRoot}/.eslintrc.*.json",
         "{workspaceRoot}/.eslintignore",
         "{workspaceRoot}/.prettierrc",
-        "{projectRoot}/.eslintrc.json",
+        "{projectRoot}/eslint.config.js",
         "{projectRoot}/.eslintignore",
         "build",
         "core"
