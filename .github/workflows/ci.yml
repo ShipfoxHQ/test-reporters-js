@@ -1,19 +1,13 @@
-name: Release
+name: Continuous integration
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version (e.g. 1.0.0)'
-        required: true
-        type: string
-
-permissions:
-  # allow to push the release tag
-  contents: write
+  push:
+    branches:
+      - main
+  pull_request: {}
 
 jobs:
-  release:
+  ci:
     runs-on: ubuntu-latest
 
     timeout-minutes: 60
@@ -48,23 +42,6 @@ jobs:
         shell: nix develop --command bash {0}
         run: pnpm -r install --frozen-lockfile
 
-      - name: Set packages version
+      - name: Run checks
         shell: nix develop --command bash {0}
-        run: pnpm nx run-many -t version --args="${{ github.event.inputs.version }}"
-
-      - name: Dry-run publishing
-        shell: nix develop --command bash {0}
-        run: pnpm nx run-many -t publish --dry-run
-
-      - name: Publish to npm
-        shell: nix develop --command bash {0}
-        run: |
-          pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_ACCESS_TOKEN }}
-          pnpm nx run-many -t publish
-
-      - name: Tag
-        run: |
-          git tag ${TAG}
-          git push origin ${TAG}
-        env:
-          TAG: v${{ github.event.inputs.version }}
+        run: pnpm nx run-many -t test -t lint -t build -t typecheck

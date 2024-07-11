@@ -1,7 +1,7 @@
 {
   "name": "@allegoria/jest-reporter",
   "license": "Apache-2.0",
-  "version": "0.1.1-1",
+  "version": "0.0.0",
   "private": false,
   "bugs": {
     "url": "https://github.com/AllegoriaHQ/test-reporters-js/issues"
