@@ -38,10 +38,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: install npm dependencies
+      - name: Install npm dependencies
         shell: nix develop --command bash {0}
         run: pnpm -r install --frozen-lockfile
 
-      - name: Update packages version
+      - name: Run checks
         shell: nix develop --command bash {0}
         run: pnpm nx run-many -t test -t lint -t build -t typecheck
