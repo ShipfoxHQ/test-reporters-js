@@ -28,6 +28,7 @@ export default class AllegoriaReporter implements Reporter {
 
   async onInit(context: Vitest) {
     this.context = context;
+    if (!this.enabled) return;
     await init({
       runner: {name: 'vitest', version: getPackageVersion('vitest')},
       reporter: {
