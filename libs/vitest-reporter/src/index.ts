@@ -1,6 +1,7 @@
 import {join} from 'node:path';
 import {
   init,
+  setOptions,
   type BaseOptions,
   sendTestRun,
   getVersionFromPackageJson,
@@ -22,18 +23,18 @@ export default class AllegoriaReporter implements Reporter {
     this.start = Date.now();
     this.enabled = options?.enabled ?? true;
     if (!this.enabled) return;
-    init({
-      ...options,
+    setOptions(options);
+  }
+
+  async onInit(context: Vitest) {
+    this.context = context;
+    await init({
       runner: {name: 'vitest', version: getPackageVersion('vitest')},
       reporter: {
         name: '@allegoria/vitest-reporter',
         version: getVersionFromPackageJson(join(__dirname, '../package.json')),
       },
     });
-  }
-
-  onInit(context: Vitest) {
-    this.context = context;
   }
 
   async onFinished(files: File[] = []): Promise<void> {

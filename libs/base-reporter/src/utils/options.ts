@@ -10,7 +10,11 @@ export interface BaseOptions {
   /** Setting this will cause the reported data to behave as if the test run was done on the given date */
   baseTimeStamp?: string;
   /** By default failing to export test results will fail the test run, enable this option to make it succeed */
-  succeedOnExportFailure?: boolean;
+  succeedOnError?: boolean;
+  /** Key to authenticate with the Allegoria API */
+  apiKey?: string;
+  /** Override the Allegoria API URL */
+  apiUrl?: string;
 }
 
 let _options: BaseOptions = {};

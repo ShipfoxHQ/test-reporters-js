@@ -1,3 +1,5 @@
-module.exports = {  
-  reporters: [['../dist/index.js', {useHttp: true, exporter: {compression: 'none'}}]],
+module.exports = {
+  reporters: [
+    ['../dist/index.js', {apiKey: 'testApiKey', useHttp: true, exporter: {compression: 'none'}}],
+  ],
 };

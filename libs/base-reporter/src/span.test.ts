@@ -1,11 +1,12 @@
-import {randomBytes} from 'node:crypto';
 import {faker} from '@faker-js/faker';
 import {describe, it, beforeEach, expect, vi} from 'vitest';
 import {genTestRun, genTestSuite, genNonExecutedTestCase, genCompletedTestCase} from '../test';
 import * as ci from './ci';
+import * as oidc from './oidc';
 import {createTestRunSpan} from './span';
 import type {RuntimeAttributes} from './tracing';
-import {init} from './index';
+import {init, setOptions} from './index';
+
 interface TestSpan {
   name: string;
   startTime: [number, number];
@@ -24,8 +25,9 @@ const testRunnerAttrs: RuntimeAttributes = {
 };
 
 describe('createTestRunSpan', () => {
-  beforeEach(() => {
-    init(testRunnerAttrs);
+  beforeEach(async () => {
+    vi.spyOn(oidc, 'getOidcToken').mockResolvedValue({token: 'token'});
+    await init(testRunnerAttrs);
   });
 
   it('Non executed spans should take the start time of the run and have 0 duration', () => {
@@ -45,8 +47,9 @@ describe('createTestRunSpan', () => {
     expect(result.endTime).toEqual(expectedTime);
   });
 
-  it('should set the root span time relatively to the baseTimestamp (in the past)', () => {
-    init({...testRunnerAttrs, baseTimeStamp: '2009-11-04T03:22:43.000Z'});
+  it('should set the root span time relatively to the baseTimestamp (in the past)', async () => {
+    setOptions({baseTimeStamp: '2009-11-04T03:22:43.000Z'});
+    await init(testRunnerAttrs);
     const runStart = new Date('2024-03-25T17:35:17.000Z');
     const runEnd = new Date('2024-03-25T17:35:17.500Z');
     const testCase = genNonExecutedTestCase();
@@ -64,8 +67,9 @@ describe('createTestRunSpan', () => {
     expect(result.endTime).toEqual(expectedEndTime);
   });
 
-  it('should set the root span time relatively to the baseTimestamp (in the future)', () => {
-    init({...testRunnerAttrs, baseTimeStamp: '2032-07-14T13:04:55.000Z'});
+  it('should set the root span time relatively to the baseTimestamp (in the future)', async () => {
+    setOptions({baseTimeStamp: '2032-07-14T13:04:55.000Z'});
+    await init(testRunnerAttrs);
     const runStart = new Date('2024-03-25T17:35:17.000Z');
     const runEnd = new Date('2024-03-25T17:35:17.500Z');
     const testCase = genNonExecutedTestCase();
@@ -83,8 +87,9 @@ describe('createTestRunSpan', () => {
     expect(result.endTime).toEqual(expectedEndTime);
   });
 
-  it('should set the test span time relatively to the baseTimestamp', () => {
-    init({...testRunnerAttrs, baseTimeStamp: '2009-11-04T03:22:43.000Z'});
+  it('should set the test span time relatively to the baseTimestamp', async () => {
+    setOptions({baseTimeStamp: '2009-11-04T03:22:43.000Z'});
+    await init(testRunnerAttrs);
 
     const testCase = genCompletedTestCase({
       start: new Date('2024-03-25T17:35:18.255Z'),
@@ -122,64 +127,20 @@ describe('createTestRunSpan', () => {
     expect(result.attributes['test.suite.path']).toBe(path);
   });
 
-  it('propagates span attributes from CI', () => {
-    vi.spyOn(ci, 'getCiMetadata').mockReturnValue({
-      contextId: undefined,
-      resourceAttributes: {},
-      spanAttributes: {
-        'some.random.attribute': 'test',
-      },
+  it('propagates attributes from CI', async () => {
+    vi.spyOn(ci, 'getCiAttributes').mockReturnValue({
+      'ci.pipeline.name': 'Super pipeline',
     });
     const testRun = genTestRun({
       suites: [genTestSuite({tests: [genNonExecutedTestCase(), genCompletedTestCase()]})],
     });
 
+    await init(testRunnerAttrs);
     const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
     expect(spans).toHaveLength(4);
 
     for (const span of spans) {
-      expect(span.attributes['some.random.attribute']).toBe('test');
-    }
-  });
-
-  it('propagates resource attributes from CI', () => {
-    vi.spyOn(ci, 'getCiMetadata').mockReturnValue({
-      contextId: undefined,
-      resourceAttributes: {
-        'some.resource.attribute': 'test',
-      },
-      spanAttributes: {},
-    });
-    const testRun = genTestRun({
-      suites: [genTestSuite({tests: [genNonExecutedTestCase(), genCompletedTestCase()]})],
-    });
-
-    init(testRunnerAttrs);
-    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    expect(spans).toHaveLength(4);
-
-    for (const span of spans) {
-      expect(span.resource._attributes['some.resource.attribute']).toBe('test');
-    }
-  });
-
-  it('propagates trace ID from CI', () => {
-    const contextId = randomBytes(16).toString('hex');
-    vi.spyOn(ci, 'getCiMetadata').mockReturnValue({
-      contextId,
-      resourceAttributes: {},
-      spanAttributes: {},
-    });
-    const testRun = genTestRun({
-      suites: [genTestSuite({tests: [genNonExecutedTestCase(), genCompletedTestCase()]})],
-    });
-
-    init(testRunnerAttrs);
-    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
-    expect(spans).toHaveLength(4);
-
-    for (const span of spans) {
-      expect(span['_spanContext']['traceId']).toBe(contextId);
+      expect(span.resource._attributes['ci.pipeline.name']).toBe('Super pipeline');
     }
   });
 });
