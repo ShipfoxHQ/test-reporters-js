@@ -25,7 +25,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@allegoria/test-reporter-base": "0.2.0",
+    "@allegoria/test-reporter-base": "workspace:^",
     "@jest/reporters": "^29.7.0"
   },
   "devDependencies": {
