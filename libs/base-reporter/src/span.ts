@@ -85,7 +85,7 @@ export async function createTestRunSpan(run: TestRun): Promise<Span[]> {
         'execution.status': run.status,
         'test.run.id': hash32HexDigits(rawResourceId),
         'test.run.config_path': relativeConfigPath,
-        'test.run.execution.id': randomBytes(16).toString('hex'),
+        'test.run.execution.id': randomBytes(8).toString('hex'),
       },
     },
     parentContext,
@@ -117,7 +117,7 @@ export function createTestSuiteSpan(
         'execution.status': suite.status,
         'test.suite.id': hash32HexDigits(rawResourceId),
         'test.suite.path': suite.path,
-        'test.suite.execution.id': randomBytes(16).toString('hex'),
+        'test.suite.execution.id': randomBytes(8).toString('hex'),
       },
     },
     parentContext,
@@ -156,7 +156,7 @@ function getTestCaseSpanAttributes(test: TestCase, parentContext: Context) {
     'test.case.id': hash32HexDigits(rawResourceId),
     'test.case.title': test.title,
     'test.case.titlePath': test.titlePath,
-    'test.case.execution.id': randomBytes(16).toString('hex'),
+    'test.case.execution.id': randomBytes(8).toString('hex'),
     'test.suite.path': parentContext.getValue(TEST_FILLE_PATH_KEY) as string,
   };
   if (test.status !== 'failed' && test.status !== 'passed') return attributes;
