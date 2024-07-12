@@ -42,9 +42,11 @@ export default class AllegoriaReporter implements Reporter {
     if (!this.enabled) return;
     const context = this.context;
     if (!context) throw new Error(`Vitest context not found`);
+    const configPath = context.projects[0].path as string;
     const end = Date.now();
     const suites = files.map((file) => createDataFromFile(file, context));
     await sendTestRun({
+      configPath,
       start: this.start,
       end,
       suites,

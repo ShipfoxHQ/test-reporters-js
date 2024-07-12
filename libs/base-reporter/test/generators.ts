@@ -10,6 +10,7 @@ import type {
 export function genTestRun(overrides?: Partial<TestRun>): TestRun {
   const start = faker.date.recent().getTime();
   return {
+    configPath: faker.system.directoryPath(),
     status: 'passed',
     start,
     end: start + faker.number.int(),

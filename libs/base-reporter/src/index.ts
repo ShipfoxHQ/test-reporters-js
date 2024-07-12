@@ -14,7 +14,7 @@ export async function setOptions(options?: BaseOptions) {
 export async function init(attributes: RuntimeAttributes) {
   try {
     const {token} = await getOidcToken();
-    initTracing(token, attributes);
+    await initTracing(token, attributes);
   } catch (error) {
     handleError(error);
   }
