@@ -30,6 +30,7 @@ export async function getRepositoryUrl(): Promise<string> {
 
 async function _getRepositoryUrl(): Promise<string> {
   const origin = await getGitOrigin();
+  console.log('Origin', origin);
   const sshOriginMatch = origin.match(gitOriginSshRegex);
   const httpsOriginMatch = origin.match(gitOriginHttpsRegex);
   if (sshOriginMatch) {
