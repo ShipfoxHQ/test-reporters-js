@@ -11,7 +11,7 @@ describe('VitestReporter', () => {
     apiCall = vi.fn();
     server = setupServer(
       http.get('https://api.allegoria.io/oidc/token', () => HttpResponse.json({token: 'token'})),
-      http.post('http://localhost:4318/v1/traces', async ({request}) => {
+      http.post('https://otlp.allegoria.io:4318/v1/traces', async ({request}) => {
         const body = await request.json();
         apiCall(body);
         return HttpResponse.json({});
