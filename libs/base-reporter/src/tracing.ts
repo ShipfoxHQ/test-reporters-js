@@ -1,3 +1,4 @@
+import {randomBytes} from 'node:crypto';
 import {setGlobalErrorHandler} from '@opentelemetry/core';
 import {OTLPTraceExporter as HttpOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
 import {OTLPTraceExporter as ProtoOTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-proto';
@@ -26,7 +27,7 @@ export interface RuntimeAttributes {
   reporter: {name: string; version?: string};
 }
 
-export function initTracing(oidcToken: string, attributes: RuntimeAttributes) {
+export async function initTracing(oidcToken: string, attributes: RuntimeAttributes) {
   tracer = undefined;
   provider = undefined;
   const options = getOptions();
@@ -35,6 +36,7 @@ export function initTracing(oidcToken: string, attributes: RuntimeAttributes) {
 
   provider = new BasicTracerProvider({
     resource: new Resource({
+      'context.id': resourceAttributes['context.id'] ?? randomBytes(8).toString('hex'),
       'test.language': 'javascript',
       [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'nodejs',
       [SEMRESATTRS_PROCESS_RUNTIME_VERSION]: process.versions.node,

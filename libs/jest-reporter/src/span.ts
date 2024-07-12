@@ -9,6 +9,7 @@ export function mapTestRun(results: AggregatedResult, globalConfig: Config.Globa
   const testSuiteEnd = Date.now();
   const suites = results.testResults.map((result) => mapTestSuite(result, globalConfig));
   return {
+    configPath: globalConfig.rootDir,
     status: results.numFailedTestSuites > 0 ? 'failed' : 'passed',
     start: results.startTime,
     end: testSuiteEnd,
