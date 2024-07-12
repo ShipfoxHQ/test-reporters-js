@@ -21,7 +21,7 @@
     },
     "publish": {
       "cache": false,
-      "dependsOn": ["build"],
+      "dependsOn": ["build", "^publish"],
       "executor": "nx:run-commands",
       "options": {
         "commands": ["pnpm publish --no-git-checks"],
