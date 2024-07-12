@@ -19,7 +19,7 @@ export function getGitRoot(): Promise<string> {
 }
 
 const gitOriginSshRegex = /^git@([^:]+):(.+)\.git$/;
-const gitOriginHttpsRegex = /^https:\/\/([^\\/]+)\/(.+)\.git$/;
+const gitOriginHttpsRegex = /^https:\/\/([^\\/]+)\/(.+)(?:\.git)?$/;
 
 let _repositoryUrl: string | undefined;
 
@@ -30,7 +30,6 @@ export async function getRepositoryUrl(): Promise<string> {
 
 async function _getRepositoryUrl(): Promise<string> {
   const origin = await getGitOrigin();
-  console.log('Origin', origin);
   const sshOriginMatch = origin.match(gitOriginSshRegex);
   const httpsOriginMatch = origin.match(gitOriginHttpsRegex);
   if (sshOriginMatch) {
@@ -38,5 +37,5 @@ async function _getRepositoryUrl(): Promise<string> {
   } else if (httpsOriginMatch) {
     return `https://${httpsOriginMatch[1]}/${httpsOriginMatch[2]}`;
   }
-  throw new Error('Failed to determine repository URL');
+  throw new Error(`Failed to determine repository URL [${origin}]`);
 }

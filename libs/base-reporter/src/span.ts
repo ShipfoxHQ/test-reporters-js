@@ -73,7 +73,6 @@ export async function createTestRunSpan(run: TestRun): Promise<Span[]> {
 
   const repositoryUrl = await getRepositoryUrl();
   const repositoryRoot = await getGitRoot();
-  console.log('Repository root', repositoryRoot);
   const relativeConfigPath = relative(repositoryRoot, run.configPath);
   const rawResourceId = `${repositoryUrl}-${relativeConfigPath}`;
 
