@@ -30,14 +30,14 @@ describe('createTestRunSpan', () => {
     await init(testRunnerAttrs);
   });
 
-  it('Non executed spans should take the start time of the run and have 0 duration', () => {
+  it('Non executed spans should take the start time of the run and have 0 duration', async () => {
     const runStart = new Date('2024-03-25T17:35:17.000Z');
     const runEnd = new Date('2024-03-25T17:35:17.500Z');
     const testCase = genNonExecutedTestCase();
     const testSuite = genTestSuite({tests: [testCase]});
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
-    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    const spans = (await createTestRunSpan(testRun)) as unknown as TestSpan[];
     const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
 
@@ -56,7 +56,7 @@ describe('createTestRunSpan', () => {
     const testSuite = genTestSuite({tests: [testCase]});
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
-    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    const spans = (await createTestRunSpan(testRun)) as unknown as TestSpan[];
     const results = spans.filter((span) => span.attributes['execution.type'] === 'test.run');
 
     expect(results).toHaveLength(1);
@@ -76,7 +76,7 @@ describe('createTestRunSpan', () => {
     const testSuite = genTestSuite({tests: [testCase]});
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
-    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    const spans = (await createTestRunSpan(testRun)) as unknown as TestSpan[];
     const results = spans.filter((span) => span.attributes['execution.type'] === 'test.run');
 
     expect(results).toHaveLength(1);
@@ -102,7 +102,7 @@ describe('createTestRunSpan', () => {
       end: new Date('2024-03-25T17:35:19.500Z'),
     });
 
-    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    const spans = (await createTestRunSpan(testRun)) as unknown as TestSpan[];
     const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -112,7 +112,7 @@ describe('createTestRunSpan', () => {
     expect(result.endTime).toEqual(expectedEndTime);
   });
 
-  it('propagates the test suite path to the test case', () => {
+  it('propagates the test suite path to the test case', async () => {
     const runStart = new Date('2024-03-25T17:35:17.000Z');
     const runEnd = new Date('2024-03-25T17:35:17.500Z');
     const path = faker.system.filePath();
@@ -120,7 +120,7 @@ describe('createTestRunSpan', () => {
     const testSuite = genTestSuite({path, tests: [testCase]});
     const testRun = genTestRun({suites: [testSuite], start: runStart, end: runEnd});
 
-    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    const spans = (await createTestRunSpan(testRun)) as unknown as TestSpan[];
     const results = spans.filter((span) => span.attributes['execution.type'] === 'test.case');
     expect(results).toHaveLength(1);
     const result = results[0];
@@ -136,7 +136,7 @@ describe('createTestRunSpan', () => {
     });
 
     await init(testRunnerAttrs);
-    const spans = createTestRunSpan(testRun) as unknown as TestSpan[];
+    const spans = (await createTestRunSpan(testRun)) as unknown as TestSpan[];
     expect(spans).toHaveLength(4);
 
     for (const span of spans) {
