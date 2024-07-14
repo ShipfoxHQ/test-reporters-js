@@ -50,7 +50,7 @@ export default class AllegoriaReporter implements Reporter {
       start: this.start,
       end,
       suites,
-      status: suites.some((suite) => suite.status === 'failed') ? 'failed' : 'passed',
+      status: suites.some((suite) => suite.status === 'failure') ? 'failure' : 'success',
     });
   }
 }

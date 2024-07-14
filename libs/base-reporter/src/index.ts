@@ -1,5 +1,6 @@
 export * from './span';
 export * from './tracing';
+export type * from './types';
 export {getPackageVersion, getVersionFromPackageJson} from './utils';
 export {type BaseOptions, handleError} from './utils';
 

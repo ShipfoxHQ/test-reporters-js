@@ -10,7 +10,7 @@ export function mapTestRun(results: AggregatedResult, globalConfig: Config.Globa
   const suites = results.testResults.map((result) => mapTestSuite(result, globalConfig));
   return {
     configPath: globalConfig.rootDir,
-    status: results.numFailedTestSuites > 0 ? 'failed' : 'passed',
+    status: results.numFailedTestSuites > 0 ? 'failure' : 'success',
     start: results.startTime,
     end: testSuiteEnd,
     suites,
@@ -24,7 +24,7 @@ export function mapTestSuite(result: TestResult, globalConfig: Config.GlobalConf
     .map((caseResult) => mapTestCase(caseResult, result));
 
   return {
-    status: result.numFailingTests > 0 ? 'failed' : 'passed',
+    status: result.numFailingTests > 0 ? 'failure' : 'success',
     start: result.perfStats.start,
     end: result.perfStats.end,
     path,
@@ -52,7 +52,7 @@ export function mapTestCase(result: AssertionResult, testSuiteResult: TestResult
     ...baseData,
     start: startedAt,
     end: finishedAt,
-    status: result.status,
+    status: result.status === 'failed' ? 'failure' : 'success',
     retries: (result.invocations ?? 1) - 1,
     retryReasons: result.retryReasons ?? [],
     failureMessages: result.failureMessages,

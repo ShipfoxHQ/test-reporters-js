@@ -32,8 +32,8 @@ describe('createDataFromFile', () => {
     });
 
     it.each([
-      ['pass', 'passed'],
-      ['fail', 'failed'],
+      ['pass', 'success'],
+      ['fail', 'failure'],
     ])('should return a completed test [%s]', (sourceState: string, destState: string) => {
       const suite = genSuite();
       suite.tasks.push(
