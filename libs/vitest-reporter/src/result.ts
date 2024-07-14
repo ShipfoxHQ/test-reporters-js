@@ -22,8 +22,8 @@ function getLocalPath(path: string, context: Vitest): string {
 
 export function getSuiteStatus(suite: Suite): ExecutionStatus {
   if (suite.result?.state === 'skip') return 'skipped';
-  if (suite.result?.state === 'pass') return 'passed';
-  return 'failed';
+  if (suite.result?.state === 'pass') return 'success';
+  return 'failure';
 }
 
 export function createDataFromFile(file: File, context: Vitest): TestSuite {
@@ -70,7 +70,7 @@ export function createDataFromTask(task: Task, parentTitlePath: string[] = []): 
   const result = getTaskResult(task);
   return [
     {
-      status: result.state === 'pass' ? 'passed' : 'failed',
+      status: result.state === 'pass' ? 'success' : 'failure',
       titlePath,
       title: task.name,
       start: result.startTime,

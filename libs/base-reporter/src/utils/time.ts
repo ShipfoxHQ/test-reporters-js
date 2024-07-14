@@ -1,6 +1,6 @@
 import type {Context} from '@opentelemetry/api';
 import {differenceInMinutes, addMinutes} from 'date-fns';
-import type {TestCase, TestSuite, TestRun} from '../span';
+import type {TestCase, TestSuite, TestRun} from '../types';
 import {getOptions} from './options';
 
 export const TEST_RUN_START_KEY = Symbol.for('test.run.start');

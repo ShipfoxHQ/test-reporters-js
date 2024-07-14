@@ -5,13 +5,13 @@ import type {
   NonExecutedTestCase,
   TestCase,
   CompletedTestCase,
-} from '../src/span';
+} from '../src/types';
 
 export function genTestRun(overrides?: Partial<TestRun>): TestRun {
   const start = faker.date.recent().getTime();
   return {
     configPath: faker.system.directoryPath(),
-    status: 'passed',
+    status: 'success',
     start,
     end: start + faker.number.int(),
     suites: [],
@@ -22,7 +22,7 @@ export function genTestRun(overrides?: Partial<TestRun>): TestRun {
 export function genTestSuite(overrides?: Partial<TestSuite>): TestSuite {
   const start = faker.date.recent().getTime();
   return {
-    status: 'passed',
+    status: 'success',
     start,
     end: start + faker.number.int(),
     path: faker.system.filePath(),
@@ -45,7 +45,7 @@ export function genCompletedTestCase(overrides?: Partial<CompletedTestCase>): Te
   const start = faker.date.recent().getTime();
   const title = faker.lorem.words();
   return {
-    status: 'passed',
+    status: 'success',
     title,
     titlePath: [title],
     start,
