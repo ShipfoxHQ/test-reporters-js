@@ -61,7 +61,7 @@ export async function initTracing(oidcToken: string, attributes: RuntimeAttribut
   provider.addSpanProcessor(new BatchSpanProcessor(exporter, options?.buffer));
   if (options?.debug) provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
   provider.register();
-  tracer = provider.getTracer('allegoria');
+  tracer = provider.getTracer('shipfox');
 
   return {provider, exporter, tracer};
 }

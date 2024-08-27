@@ -1,6 +1,6 @@
 # Javascript test reporters
 
-Allegoria test reporters for Javascript/Typescript test runners.
+Shipfox test reporters for Javascript/Typescript test runners.
 
 ## Development
 

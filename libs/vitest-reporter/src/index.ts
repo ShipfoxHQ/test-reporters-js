@@ -6,20 +6,20 @@ import {
   sendTestRun,
   getVersionFromPackageJson,
   getPackageVersion,
-} from '@allegoria/test-reporter-base';
+} from '@shipfox/test-reporter-base';
 import type {Reporter, File, Vitest} from 'vitest';
 import {createDataFromFile} from './result';
 
-export type AllegoriaReporterOptions = BaseOptions & {
+export type ShipfoxReporterOptions = BaseOptions & {
   enabled?: boolean;
 };
 
-export default class AllegoriaReporter implements Reporter {
+export default class ShipfoxReporter implements Reporter {
   start: number;
   enabled: boolean;
   context: Vitest | undefined;
 
-  constructor(options?: AllegoriaReporterOptions) {
+  constructor(options?: ShipfoxReporterOptions) {
     this.start = Date.now();
     this.enabled = options?.enabled ?? true;
     if (!this.enabled) return;
@@ -32,7 +32,7 @@ export default class AllegoriaReporter implements Reporter {
     await init({
       runner: {name: 'vitest', version: getPackageVersion('vitest')},
       reporter: {
-        name: '@allegoria/vitest-reporter',
+        name: '@shipfox/vitest-reporter',
         version: getVersionFromPackageJson(join(__dirname, '../package.json')),
       },
     });

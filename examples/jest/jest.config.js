@@ -1,3 +1,3 @@
 module.exports = {
-  reporters: ['default', ['@allegoria/jest-reporter', {api_key: 'your_allegoria_api_key'}]],
+  reporters: ['default', ['@shipfox/jest-reporter', {api_key: 'your_shipfox_api_key'}]],
 };

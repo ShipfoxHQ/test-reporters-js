@@ -9,7 +9,7 @@ export function handleError(error: unknown): void {
     }
     return;
   }
-  console.error('Failed to push test results to Allegoria');
+  console.error('Failed to push test results to Shipfox');
   console.error(error);
   if (!succeedOnError) process.exit(1);
 }

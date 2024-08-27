@@ -1,4 +1,4 @@
-import type {TestCase, TestRun, TestSuite} from '@allegoria/test-reporter-base';
+import type {TestCase, TestRun, TestSuite} from '@shipfox/test-reporter-base';
 import type {AggregatedResult} from '@jest/reporters';
 import type {TestResult, AssertionResult} from '@jest/test-result';
 import type {Config} from '@jest/types';

@@ -77,7 +77,7 @@ importers:
 
   examples/jest:
     devDependencies:
-      '@allegoria/jest-reporter':
+      '@shipfox/jest-reporter':
         specifier: workspace:^
         version: link:../../libs/jest-reporter
       jest:
@@ -86,7 +86,7 @@ importers:
 
   examples/vitest:
     devDependencies:
-      '@allegoria/vitest-reporter':
+      '@shipfox/vitest-reporter':
         specifier: workspace:^
         version: link:../../libs/vitest-reporter
       vitest:
@@ -138,7 +138,7 @@ importers:
 
   libs/jest-reporter:
     dependencies:
-      '@allegoria/test-reporter-base':
+      '@shipfox/test-reporter-base':
         specifier: workspace:^
         version: link:../base-reporter
       '@jest/reporters':
@@ -163,7 +163,7 @@ importers:
 
   libs/vitest-reporter:
     dependencies:
-      '@allegoria/test-reporter-base':
+      '@shipfox/test-reporter-base':
         specifier: workspace:^
         version: link:../base-reporter
       '@jest/reporters':

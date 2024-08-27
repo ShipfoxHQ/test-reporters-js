@@ -1,4 +1,4 @@
-import type {CompletedTestCase, NonExecutedTestCase} from '@allegoria/test-reporter-base';
+import type {CompletedTestCase, NonExecutedTestCase} from '@shipfox/test-reporter-base';
 import {describe, it, expect, type TaskState, Vitest} from 'vitest';
 import {genFile, genSuite, genTest} from '../test';
 import {createDataFromFile, createDataFromTask} from './result';

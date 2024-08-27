@@ -1,5 +1,5 @@
 {
-  description = "Allegoria Monorepo Nix configuration file";
+  description = "Shipfox test reporters Nix configuration file";
 
   # Flake inputs
   inputs = {

@@ -10,7 +10,7 @@ describe('JestReporter', () => {
   beforeAll(() => {
     apiCall = vi.fn();
     server = setupServer(
-      http.get('https://api.allegoria.io/oidc/token', () => HttpResponse.json({token: 'token'})),
+      http.get('https://api.shipfox.io/oidc/token', () => HttpResponse.json({token: 'token'})),
       http.post('https://otlp.allegoria.io/v1/traces', async ({request}) => {
         const body = await request.json();
         apiCall(body);

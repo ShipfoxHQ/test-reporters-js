@@ -1,13 +1,13 @@
 {
-  "name": "@allegoria/test-reporter-jest-example",
+  "name": "@shipfox/test-reporter-jest-example",
   "license": "Apache-2.0",
   "version": "1.0.0",
-  "private" : true,
+  "private": true,
   "scripts": {
     "test": "jest"
   },
   "devDependencies": {
-    "@allegoria/jest-reporter": "workspace:^",
+    "@shipfox/jest-reporter": "workspace:^",
     "jest": "^29.7.0"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@allegoria/workspace",
+  "name": "@shipfox/workspace",
   "license": "Apache-2.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",

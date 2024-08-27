@@ -6,22 +6,22 @@ import {
   sendTestRun,
   getPackageVersion,
   getVersionFromPackageJson,
-} from '@allegoria/test-reporter-base';
+} from '@shipfox/test-reporter-base';
 import type {Config, Reporter, TestContext, AggregatedResult} from '@jest/reporters';
 import type {Test, TestCaseResult} from '@jest/test-result';
 import type {Circus} from '@jest/types';
 import {mapTestRun} from './span';
 import {storeStartedTest, updateEndTimer} from './storage';
 
-export type AllegoriaReporterOptions = BaseOptions & {
+export type ShipfoxReporterOptions = BaseOptions & {
   enabled?: boolean;
 };
 
-export default class AllegoriaReporter implements Reporter {
+export default class ShipfoxReporter implements Reporter {
   protected readonly enabled: boolean;
   protected readonly globalConfig: Config.GlobalConfig;
 
-  constructor(globalConfig: Config.GlobalConfig, options?: AllegoriaReporterOptions) {
+  constructor(globalConfig: Config.GlobalConfig, options?: ShipfoxReporterOptions) {
     this.enabled = options?.enabled ?? true;
     this.globalConfig = globalConfig;
     if (!this.enabled) return;
@@ -33,7 +33,7 @@ export default class AllegoriaReporter implements Reporter {
     await init({
       runner: {name: 'jest', version: getPackageVersion('jest')},
       reporter: {
-        name: '@allegoria/jest-reporter',
+        name: '@shipfox/jest-reporter',
         version: getVersionFromPackageJson(join(__dirname, '../package.json')),
       },
     });
