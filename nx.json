@@ -24,7 +24,7 @@
       "dependsOn": ["build", "^publish"],
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["pnpm publish --no-git-checks"],
+        "commands": ["pnpm publish --no-git-checks --access public"],
         "cwd": "{projectRoot}"
       }
     },
