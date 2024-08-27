@@ -1,14 +1,14 @@
 {
-  "name": "@allegoria/test-reporter-base",
+  "name": "@shipfox/test-reporter-base",
   "license": "Apache-2.0",
   "version": "0.0.0",
   "private": false,
   "bugs": {
-    "url": "https://github.com/AllegoriaHQ/test-reporters-js/issues"
+    "url": "https://github.com/ShipfoxHQ/test-reporters-js/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AllegoriaHQ/test-reporters-js.git"
+    "url": "https://github.com/ShipfoxHQ/test-reporters-js.git"
   },
   "main": "dist/index.js",
   "types": "src/index.ts",

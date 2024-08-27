@@ -11,9 +11,9 @@ export interface BaseOptions {
   baseTimeStamp?: string;
   /** By default failing to export test results will fail the test run, enable this option to make it succeed */
   succeedOnError?: boolean;
-  /** Key to authenticate with the Allegoria API */
+  /** Key to authenticate with the Shipfox API */
   apiKey?: string;
-  /** Override the Allegoria API URL */
+  /** Override the Shipfox API URL */
   apiUrl?: string;
 }
 

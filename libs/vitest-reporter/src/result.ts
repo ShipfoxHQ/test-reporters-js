@@ -1,5 +1,5 @@
 import {relative} from 'node:path';
-import type {TestSuite, TestCase, ExecutionStatus} from '@allegoria/test-reporter-base';
+import type {TestSuite, TestCase, ExecutionStatus} from '@shipfox/test-reporter-base';
 import type {Task, TaskResult, File, Vitest, RunMode, Suite} from 'vitest';
 
 type CompletedTaskResult = Omit<TaskResult, 'startTime' | 'duration'> & {
