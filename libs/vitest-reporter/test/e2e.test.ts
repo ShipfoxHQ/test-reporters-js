@@ -11,7 +11,7 @@ describe('VitestReporter', () => {
     apiCall = vi.fn();
     server = setupServer(
       http.get('https://api.shipfox.io/oidc/token', () => HttpResponse.json({token: 'token'})),
-      http.post('https://otlp.shipfox.io1/traces', async ({request}) => {
+      http.post('https://otlp.shipfox.io/v1/traces', async ({request}) => {
         const body = await request.json();
         apiCall(body);
         return HttpResponse.json({});
